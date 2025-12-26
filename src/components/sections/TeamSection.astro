@@ -1,0 +1,144 @@
+---
+const teamMembers = [
+  {
+    id: "1",
+    name: "대표 변호사 K",
+    role: "법률 총괄 · 서울대 로스쿨",
+    bio: `법과 숫자 사이에서 가장 유리한 지점을 찾습니다. 대형 로펌에서 금융 분쟁을 다루며
+      '채권자의 논리'를 철저히 익혔습니다. 은행과 카드사가 어떤 근거로 채무자를 압박하는지,
+      그 전략의 허점이 어디인지를 누구보다 잘 압니다.
+
+      이제 그 논리를 뒤집어 채무자의 편에 섭니다. 단순히 서류를 대신 작성하는 것이 아니라,
+      법원과 회생위원이 '인가할 수밖에 없는' 논리 구조를 설계합니다. 200건 이상의 회생 사건을
+      직접 수임하며 쌓아온 실전 경험이 그 기반입니다.`,
+    credentials: [
+      "서울대학교 법학전문대학원 졸업",
+      "제00회 변호사시험 합격",
+      "법무법인(유) ○○ 금융팀 4년 경력",
+      "개인회생 인가 200건+ 직접 수임",
+      "서울회생법원 실무연구회 참여",
+      "대한변호사협회 도산법 연수 이수",
+      "금융분쟁조정위원회 자문 경험",
+      "주식회사 아크로 공동창업자"
+    ],
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&h=1200&fit=crop&crop=face"
+  },
+  {
+    id: "2",
+    name: "금융 분석가 L",
+    role: "데이터 총괄 · 서울대 경제학부",
+    bio: `금융기관의 전산망을 직접 구축했던 사람입니다. 은행이 어떻게 대출을 심사하고,
+      연체를 관리하며, 채권을 추심하는지 시스템 레벨에서 이해합니다.
+      신용평가 모델, 연체 예측 알고리즘, 채권 매각 로직까지 직접 설계해봤습니다.
+
+      그 지식으로 가장 낮은 변제율을 설계합니다. 채권자가 이의를 제기할 수 없는
+      숫자 논리를 만들고, 법원이 납득할 수 있는 재산 평가 근거를 제시합니다.
+      핀테크 창업과 Exit 경험을 통해 금융과 기술의 교차점에서 문제를 해결하는 방법을 체득했습니다.`,
+    credentials: [
+      "서울대학교 경제학부 졸업",
+      "○○은행 여신심사시스템 개발 참여",
+      "핀테크 스타트업 창업 및 Exit 경험",
+      "금융위원회 규제 샌드박스 선정",
+      "신용평가사(CB) 데이터 분석 자문",
+      "개인회생 전산 시스템 아키텍처 설계",
+      "채권추심 프로세스 역설계 전문",
+      "주식회사 아크로 공동창업자"
+    ],
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1200&fit=crop&crop=face"
+  },
+  {
+    id: "3",
+    name: "AI 개발자 P",
+    role: "기술 총괄 · 서울대 컴퓨터공학부",
+    bio: `법원이 어떤 서류를 원하는지, 어떤 표현에 설득되는지를 데이터로 분석합니다.
+      10만 건 이상의 회생 판례, 수천 페이지의 실무준칙, 회생위원 질의응답 패턴을 학습시켰습니다.
+      이 AI가 변제계획안을 작성하고, 진술서의 문장 하나하나를 최적화합니다.
+
+      기술은 도구일 뿐입니다. 중요한 것은 '무엇을 자동화하고, 무엇을 사람이 판단할 것인가'입니다.
+      법률 AI 스타트업에서 CTO로 일하며, 기계가 잘하는 일과 변호사가 잘하는 일의 경계를
+      수없이 탐색했습니다. 그 경험이 지금 이 시스템의 기반입니다.`,
+    credentials: [
+      "서울대학교 컴퓨터공학부 졸업",
+      "○○ 법률 AI 스타트업 CTO 역임",
+      "자연어처리(NLP) 연구 경력 5년",
+      "법률 문서 자동 생성 알고리즘 개발",
+      "회생 판례 10만건+ 학습 모델 구축",
+      "대한법률구조공단 AI 자문",
+      "AWS/GCP 클라우드 아키텍처 설계",
+      "주식회사 아크로 공동창업자"
+    ],
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=1200&fit=crop&crop=face"
+  }
+];
+---
+
+<section id="team" class="bg-stone-50">
+  <div class="py-16 text-center bg-white border-b border-stone-100">
+    <h2 class="text-base text-blue-600 font-bold tracking-wide uppercase">Who We Are</h2>
+    <p class="mt-2 text-4xl font-extrabold text-stone-900">서울대 출신 융합 전문가 팀</p>
+    <p class="mt-4 text-lg text-stone-500 max-w-2xl mx-auto px-4">
+      법률, 경제, 컴퓨터공학. 각 분야 최고의 전문가들이 모여<br>가장 논리적이고 완벽한 변제계획안을 만듭니다.
+    </p>
+  </div>
+
+  <div class="team-magazine">
+    <div class="team-sticky-image hidden lg:block">
+      <div class="team-image-container">
+        {teamMembers.map((member, index) => (
+          <div
+            class={`team-image ${index === 0 ? 'active' : ''}`}
+            data-member={member.id}
+            style={`background-image: url('${member.image}');`}
+          />
+        ))}
+        <div class="team-image-overlay"></div>
+      </div>
+    </div>
+
+    <div class="team-scroll-content">
+      {teamMembers.map((member) => (
+        <div class="team-member-section" data-member={member.id}>
+          <div class="team-member-name">{member.name}</div>
+          <div class="team-member-role">{member.role}</div>
+          <p class="team-member-bio" set:html={member.bio.split('\n\n').map(p => p.trim()).join('<br><br>')} />
+          <div class="team-member-credentials">
+            {member.credentials.map((credential) => (
+              <div class="team-credential">
+                <div class="team-credential-bullet"></div>
+                <span>{credential}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const teamImages = document.querySelectorAll('.team-image');
+  const teamSections = document.querySelectorAll('.team-member-section');
+
+  if (teamImages.length > 0 && teamSections.length > 0) {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -40% 0px',
+      threshold: 0
+    };
+
+    const teamObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const memberId = (entry.target as HTMLElement).dataset.member;
+          teamImages.forEach(img => {
+            img.classList.toggle('active', (img as HTMLElement).dataset.member === memberId);
+          });
+        }
+      });
+    }, observerOptions);
+
+    teamSections.forEach(section => {
+      teamObserver.observe(section);
+    });
+  }
+</script>

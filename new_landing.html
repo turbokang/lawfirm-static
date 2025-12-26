@@ -1,0 +1,3146 @@
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국내 최초 AI 회생 솔루션 | 법무법인 아크로</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+            background-color: #FAFAF9;
+            color: #1C1917;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 3px;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #2563EB, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Hero Animations */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .hero-title {
+            overflow: hidden;
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: #2563eb;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInUp 1s ease 2s forwards;
+        }
+        
+        .scroll-indicator span {
+            font-size: 12px;
+            color: #78716c;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid #78716c;
+            border-bottom: 2px solid #78716c;
+            transform: rotate(45deg);
+            animation: scrollBounce 2s infinite;
+        }
+        
+        @keyframes scrollBounce {
+            0%, 20%, 50%, 80%, 100% { transform: rotate(45deg) translateY(0); }
+            40% { transform: rotate(45deg) translateY(8px); }
+            60% { transform: rotate(45deg) translateY(4px); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .hero-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: heroFadeIn 0.8s ease forwards;
+        }
+        
+        .hero-fade-in-delay-1 { animation-delay: 0.3s; }
+        .hero-fade-in-delay-2 { animation-delay: 0.6s; }
+        .hero-fade-in-delay-3 { animation-delay: 1.5s; }
+        .hero-fade-in-delay-4 { animation-delay: 1.8s; }
+        
+        @keyframes heroFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Comparison Grid Section */
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .comparison-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .comparison-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-4px);
+        }
+        
+        .check-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .check-icon.yes {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+        
+        .check-icon.no {
+            background: rgba(120, 113, 108, 0.15);
+            color: #57534e;
+        }
+        
+        /* Terminal Style */
+        .terminal-window {
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terminal-header {
+            background: #161b22;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+        
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: #8b949e;
+            font-size: 13px;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            min-height: 360px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        
+        .terminal-line {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .terminal-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .terminal-prompt {
+            color: #7ee787;
+        }
+        
+        .terminal-command {
+            color: #c9d1d9;
+        }
+        
+        .terminal-output {
+            color: #8b949e;
+            padding-left: 20px;
+        }
+        
+        .terminal-success {
+            color: #3fb950;
+        }
+        
+        .terminal-highlight {
+            color: #58a6ff;
+        }
+        
+        .terminal-warning {
+            color: #d29922;
+        }
+        
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #c9d1d9;
+            animation: terminalBlink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        
+        @keyframes terminalBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .terminal-typing {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: terminalTyping 0.5s steps(30) forwards;
+        }
+        
+        @keyframes terminalTyping {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        /* Chat Style Survey */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 720px;
+            background: #f8fafc;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Loading Overlay for Calculation */
+        .chat-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 24px;
+            backdrop-filter: blur(4px);
+        }
+        
+        .chat-loading-spinner {
+            width: 56px;
+            height: 56px;
+            border: 5px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: chatSpin 0.8s linear infinite;
+        }
+        
+        @keyframes chatSpin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .chat-loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .chat-loading-progress {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #64748b;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        /* Form Modal for Number Inputs */
+        .chat-form-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 8px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .chat-form-modal h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chat-form-modal h4::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+        
+        .chat-form-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .chat-form-group label {
+            font-size: 13px;
+            color: #64748b;
+            width: 100px;
+            flex-shrink: 0;
+        }
+        
+        .chat-form-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: right;
+            transition: border-color 0.2s;
+        }
+        
+        .chat-form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .chat-form-group span {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        
+        /* Form Field with Help Text */
+        .chat-form-field {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .chat-form-field:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .chat-form-field-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        
+        .chat-form-field-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .chat-form-field-tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .chat-form-field-tooltip-icon {
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+        }
+        
+        .chat-form-field-tooltip-text {
+            display: none;
+            position: absolute;
+            left: 50%;
+            bottom: 100%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: #1e293b;
+            color: white;
+            font-size: 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            margin-bottom: 6px;
+            z-index: 100;
+            max-width: 250px;
+            white-space: normal;
+            text-align: center;
+        }
+        
+        .chat-form-field-tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
+        }
+        
+        .chat-form-field-tooltip:hover .chat-form-field-tooltip-text {
+            display: block;
+        }
+        
+        .chat-form-field-help {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .chat-form-field-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chat-form-field-input-row input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: right;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .chat-form-field-input-row input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .chat-form-field-input-row span {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .chat-form-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            padding-top: 16px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .chat-form-section-title:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        
+        /* Result Card in Chat - 깔끔한 스타일 */
+        .chat-result-card {
+            background: #ffffff;
+            border-radius: 12px;
+            margin-top: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .chat-result-title {
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .chat-result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f8fafc;
+        }
+        
+        .chat-result-row:last-child {
+            border-bottom: none;
+        }
+        
+        .chat-result-row.highlight {
+            background: #f8fafc;
+        }
+        
+        .chat-result-label {
+            color: #64748b;
+        }
+        
+        .chat-result-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .chat-result-value.primary {
+            color: #2563eb;
+        }
+        
+        .chat-result-value.accent {
+            color: #059669;
+        }
+        
+        .chat-result-divider {
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        /* Free Chat Input */
+        .chat-free-input {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .chat-free-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .chat-free-input input:focus {
+            border-color: #3b82f6;
+        }
+        
+        .chat-free-input button {
+            padding: 12px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .chat-free-input button:hover {
+            background: #2563eb;
+        }
+        
+        .chat-header {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .chat-header-info h4 {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 15px;
+        }
+        
+        .chat-header-info span {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .chat-steps {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+        
+        .chat-step {
+            width: 24px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-step.active {
+            background: #3b82f6;
+        }
+        
+        .chat-step.done {
+            background: #22c55e;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: chatFadeIn 0.3s ease forwards;
+        }
+        
+        @keyframes chatFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.bot {
+            align-self: flex-start;
+        }
+        
+        .chat-message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .chat-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.bot .chat-message-avatar {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .chat-message.user .chat-message-avatar {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+        
+        .chat-bubble {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .chat-message.bot .chat-bubble {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .chat-message.user .chat-bubble {
+            background: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+        
+        .chat-typing span {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+        
+        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+        
+        .chat-input-area {
+            background: white;
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chat-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .chat-option {
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-option:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .chat-option.selected {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .chat-number-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .chat-number-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .chat-number-input input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .chat-submit {
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-submit:hover {
+            background: #2563eb;
+        }
+        
+        .chat-submit:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+        
+        /* Survey Styles */
+        .survey-container {
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+        }
+        .survey-progress {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+        .survey-progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #2563EB, #1e40af);
+            transition: width 0.3s ease;
+        }
+        .survey-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .survey-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .survey-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+        .survey-option {
+            display: flex;
+            align-items: center;
+            padding: 16px 18px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+        .survey-option:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .survey-option.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .survey-option-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .survey-option.selected .survey-option-check {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        .survey-option.selected .survey-option-check::after {
+            content: "✓";
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .survey-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: right;
+            transition: all 0.2s ease;
+        }
+        .survey-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .survey-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .survey-btn {
+            padding: 14px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .survey-btn-primary {
+            flex: 1;
+            background: linear-gradient(to right, #2563EB, #1e40af);
+            color: white;
+        }
+        .survey-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .survey-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .survey-btn-secondary {
+            background: white;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+        }
+        .survey-btn-secondary:hover {
+            background: #f9fafb;
+        }
+        
+        /* Team Card with Background Image */
+        /* Magazine-style Team Section */
+        .team-magazine {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .team-sticky-image {
+            position: sticky;
+            top: 0;
+            width: 45%;
+            height: 100vh;
+            overflow: hidden;
+            margin-left: 40px;
+        }
+        .team-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .team-image {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .team-image.active {
+            opacity: 1;
+        }
+        .team-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent 60%, rgba(250, 250, 249, 1) 100%);
+        }
+        .team-scroll-content {
+            width: 55%;
+            padding: 60px 60px 60px 80px;
+            margin-right: 40px;
+        }
+        .team-member-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 0;
+            box-sizing: border-box;
+        }
+        .team-member-section:last-child {
+            height: 80vh;
+        }
+        .team-member-name {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #1c1917;
+            margin-bottom: 8px;
+        }
+        .team-member-role {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        .team-member-bio {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #57534e;
+            margin-bottom: 28px;
+        }
+        .team-member-credentials {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .team-credential {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #44403c;
+        }
+        .team-credential-bullet {
+            width: 6px;
+            height: 6px;
+            background: #2563eb;
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 1024px) {
+            .team-magazine {
+                flex-direction: column;
+            }
+            .team-sticky-image {
+                position: relative;
+                width: 100%;
+                height: 50vh;
+                margin-left: 0;
+            }
+            .team-scroll-content {
+                width: 100%;
+                padding: 40px 24px;
+                margin-right: 0;
+            }
+            .team-member-section {
+                height: auto;
+                min-height: auto;
+                padding: 60px 0;
+            }
+            .team-image-overlay {
+                background: linear-gradient(to top, rgba(250, 250, 249, 1) 0%, transparent 30%);
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Form fields */
+        .form-field-group {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group-header {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1d4ed8;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .form-group-header:first-child {
+            margin-top: 0;
+        }
+        .form-field-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .form-field-help {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center cursor-pointer" onclick="scrollToSection('hero')">
+                    <span class="text-2xl font-black tracking-tighter text-stone-900">Acro<span class="text-blue-600">.AI</span></span>
+                    <span class="ml-2 text-xs font-medium text-stone-500 hidden sm:block">국내 최초 AI 회생 솔루션</span>
+                </div>
+                <div class="hidden md:flex space-x-6 items-center">
+                    <button onclick="scrollToSection('ai-tech')" class="text-stone-600 hover:text-blue-600 font-medium transition">서비스 소개</button>
+                    <button onclick="scrollToSection('team')" class="text-stone-600 hover:text-blue-600 font-medium transition">팀 소개</button>
+                    <button onclick="scrollToSection('pricing')" class="text-stone-600 hover:text-blue-600 font-medium transition">비용</button>
+                    <button onclick="scrollToSection('testimonials')" class="text-stone-600 hover:text-blue-600 font-medium transition">후기</button>
+                    <button onclick="scrollToSection('calculator')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-lg shadow-blue-600/20">
+                        무료 진단
+                    </button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-stone-600 hover:text-stone-900 focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100 p-4 space-y-3 shadow-lg">
+            <button onclick="scrollToSection('ai-tech')" class="block w-full text-left font-medium text-stone-600">서비스 소개</button>
+            <button onclick="scrollToSection('team')" class="block w-full text-left font-medium text-stone-600">팀 소개</button>
+            <button onclick="scrollToSection('pricing')" class="block w-full text-left font-medium text-stone-600">비용</button>
+            <button onclick="scrollToSection('testimonials')" class="block w-full text-left font-medium text-stone-600">후기</button>
+            <button onclick="scrollToSection('calculator')" class="block w-full text-left font-bold text-blue-600">무료 진단 시작하기</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden bg-stone-50">
+        <!-- Particle Canvas Background -->
+        <canvas id="hero-canvas"></canvas>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="hero-fade-in inline-block bg-stone-900 rounded-full px-4 py-1.5 mb-8">
+                <span class="text-stone-300 text-sm font-medium tracking-wide">서울대 로스쿨 × 핀테크 창업자</span>
+            </div>
+            
+            <h1 class="hero-title text-5xl md:text-7xl font-black tracking-tight text-stone-900 mb-8 leading-tight">
+                <span id="typing-text"></span><span class="typing-cursor"></span>
+            </h1>
+            
+            <p class="hero-fade-in hero-fade-in-delay-3 mt-4 text-xl text-stone-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+                국내 유일, 금융기관 전산망을 구축한 핀테크 전문가와 변호사가 직접 개발했습니다.<br class="hidden md:block">
+                채무자회생법과 수만 건의 판례를 학습한 AI가 당신의 최저 변제율을 설계합니다.
+            </p>
+            
+            <div class="hero-fade-in hero-fade-in-delay-4 flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="scrollToSection('calculator')" class="px-8 py-4 bg-stone-900 text-white rounded-full font-bold text-lg hover:bg-stone-800 transition transform hover:scale-105">
+                    내 예상 변제금 확인하기
+                </button>
+                <button onclick="scrollToSection('contact')" class="px-8 py-4 bg-transparent text-stone-700 border-2 border-stone-300 rounded-full font-bold text-lg hover:border-stone-900 hover:text-stone-900 transition">
+                    무료 상담 신청
+                </button>
+            </div>
+            </div>
+            
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator" onclick="scrollToSection('team')">
+            <span>Scroll</span>
+            <div class="scroll-arrow"></div>
+                </div>
+    </header>
+
+    <!-- Team Section - Magazine Style -->
+    <section id="team" class="bg-stone-50">
+        <!-- Section Header -->
+        <div class="py-16 text-center bg-white border-b border-stone-100">
+            <h2 class="text-base text-blue-600 font-bold tracking-wide uppercase">Who We Are</h2>
+            <p class="mt-2 text-4xl font-extrabold text-stone-900">서울대 출신 융합 전문가 팀</p>
+            <p class="mt-4 text-lg text-stone-500 max-w-2xl mx-auto px-4">
+                법률, 경제, 컴퓨터공학. 각 분야 최고의 전문가들이 모여<br>가장 논리적이고 완벽한 변제계획안을 만듭니다.
+            </p>
+                </div>
+        
+        <!-- Magazine Layout -->
+        <div class="team-magazine">
+            <!-- Sticky Image Panel -->
+            <div class="team-sticky-image hidden lg:block">
+                <div class="team-image-container">
+                    <div class="team-image active" data-member="1" style="background-image: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&h=1200&fit=crop&crop=face');"></div>
+                    <div class="team-image" data-member="2" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1200&fit=crop&crop=face');"></div>
+                    <div class="team-image" data-member="3" style="background-image: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=1200&fit=crop&crop=face');"></div>
+                    <div class="team-image-overlay"></div>
+                </div>
+                </div>
+            
+            <!-- Scrollable Content -->
+            <div class="team-scroll-content">
+                <!-- Member 1 -->
+                <div class="team-member-section" data-member="1">
+                    <div class="team-member-name">대표 변호사 K</div>
+                    <div class="team-member-role">법률 총괄 · 서울대 로스쿨</div>
+                    <p class="team-member-bio">
+                        법과 숫자 사이에서 가장 유리한 지점을 찾습니다. 대형 로펌에서 금융 분쟁을 다루며 
+                        '채권자의 논리'를 철저히 익혔습니다. 은행과 카드사가 어떤 근거로 채무자를 압박하는지, 
+                        그 전략의 허점이 어디인지를 누구보다 잘 압니다.
+                        <br><br>
+                        이제 그 논리를 뒤집어 채무자의 편에 섭니다. 단순히 서류를 대신 작성하는 것이 아니라, 
+                        법원과 회생위원이 '인가할 수밖에 없는' 논리 구조를 설계합니다. 200건 이상의 회생 사건을 
+                        직접 수임하며 쌓아온 실전 경험이 그 기반입니다.
+                    </p>
+                    <div class="team-member-credentials">
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>서울대학교 법학전문대학원 졸업</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>제00회 변호사시험 합격</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>법무법인(유) ○○ 금융팀 4년 경력</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>개인회생 인가 200건+ 직접 수임</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>서울회생법원 실무연구회 참여</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>대한변호사협회 도산법 연수 이수</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>금융분쟁조정위원회 자문 경험</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>주식회사 아크로 공동창업자</span></div>
+            </div>
+        </div>
+        
+                <!-- Member 2 -->
+                <div class="team-member-section" data-member="2">
+                    <div class="team-member-name">금융 분석가 L</div>
+                    <div class="team-member-role">데이터 총괄 · 서울대 경제학부</div>
+                    <p class="team-member-bio">
+                        금융기관의 전산망을 직접 구축했던 사람입니다. 은행이 어떻게 대출을 심사하고, 
+                        연체를 관리하며, 채권을 추심하는지 시스템 레벨에서 이해합니다. 
+                        신용평가 모델, 연체 예측 알고리즘, 채권 매각 로직까지 직접 설계해봤습니다.
+                        <br><br>
+                        그 지식으로 가장 낮은 변제율을 설계합니다. 채권자가 이의를 제기할 수 없는 
+                        숫자 논리를 만들고, 법원이 납득할 수 있는 재산 평가 근거를 제시합니다. 
+                        핀테크 창업과 Exit 경험을 통해 금융과 기술의 교차점에서 문제를 해결하는 방법을 체득했습니다.
+                    </p>
+                    <div class="team-member-credentials">
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>서울대학교 경제학부 졸업</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>○○은행 여신심사시스템 개발 참여</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>핀테크 스타트업 창업 및 Exit 경험</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>금융위원회 규제 샌드박스 선정</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>신용평가사(CB) 데이터 분석 자문</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>개인회생 전산 시스템 아키텍처 설계</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>채권추심 프로세스 역설계 전문</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>주식회사 아크로 공동창업자</span></div>
+        </div>
+                </div>
+                
+                <!-- Member 3 -->
+                <div class="team-member-section" data-member="3">
+                    <div class="team-member-name">AI 개발자 P</div>
+                    <div class="team-member-role">기술 총괄 · 서울대 컴퓨터공학부</div>
+                    <p class="team-member-bio">
+                        법원이 어떤 서류를 원하는지, 어떤 표현에 설득되는지를 데이터로 분석합니다. 
+                        10만 건 이상의 회생 판례, 수천 페이지의 실무준칙, 회생위원 질의응답 패턴을 학습시켰습니다.
+                        이 AI가 변제계획안을 작성하고, 진술서의 문장 하나하나를 최적화합니다.
+                        <br><br>
+                        기술은 도구일 뿐입니다. 중요한 것은 '무엇을 자동화하고, 무엇을 사람이 판단할 것인가'입니다.
+                        법률 AI 스타트업에서 CTO로 일하며, 기계가 잘하는 일과 변호사가 잘하는 일의 경계를 
+                        수없이 탐색했습니다. 그 경험이 지금 이 시스템의 기반입니다.
+                    </p>
+                    <div class="team-member-credentials">
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>서울대학교 컴퓨터공학부 졸업</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>○○ 법률 AI 스타트업 CTO 역임</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>자연어처리(NLP) 연구 경력 5년</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>법률 문서 자동 생성 알고리즘 개발</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>회생 판례 10만건+ 학습 모델 구축</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>대한법률구조공단 AI 자문</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>AWS/GCP 클라우드 아키텍처 설계</span></div>
+                        <div class="team-credential"><div class="team-credential-bullet"></div><span>주식회사 아크로 공동창업자</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Tech Section (융합 전문가 + AI Technology 통합) -->
+    <section id="ai-tech" class="py-24 bg-stone-900 text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 왜 융합 전문가가 필요한가 -->
+            <div class="text-center mb-16">
+                <span class="text-blue-400 text-sm font-bold tracking-wide uppercase">Why Us</span>
+                <h2 class="text-4xl font-black mt-3 mb-6">왜 '융합 전문가'가 필요한가요?</h2>
+                <p class="text-stone-400 text-lg max-w-2xl mx-auto leading-relaxed">
+                    개인회생은 단순한 법률 문제가 아닙니다.<br>
+                    <strong class="text-white">법률 + 금융 + 기술</strong>, 세 가지가 모두 필요합니다.
+                </p>
+            </div>
+
+            <!-- 특장점 그리드 -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-20" id="comparisonGrid">
+                <!-- 카드 1 -->
+                <div class="comparison-card visible" data-index="0">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">01</span>
+                </div>
+                    <h3 class="text-lg font-bold text-white mb-2">추가비용 0원 보장</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">보정명령, 서류 보완 등 어떤 상황에서도 처음 안내드린 비용 외 추가금이 없습니다.</p>
+                </div>
+
+                <!-- 카드 2 -->
+                <div class="comparison-card" data-index="1">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">02</span>
+                </div>
+                    <h3 class="text-lg font-bold text-white mb-2">금융기관 대응 노하우</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">은행/카드사 전산망을 구축한 경험으로 채권자 논리를 정확히 파악합니다.</p>
+            </div>
+
+                <!-- 카드 3 -->
+                <div class="comparison-card" data-index="2">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">03</span>
+                                </div>
+                    <h3 class="text-lg font-bold text-white mb-2">AI 서류 자동화</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">수만 건의 판례를 학습한 AI가 변제계획안과 진술서를 자동 생성합니다.</p>
+                            </div>
+                
+                <!-- 카드 4 -->
+                <div class="comparison-card" data-index="3">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">04</span>
+                                </div>
+                    <h3 class="text-lg font-bold text-white mb-2">최저 변제율 설계</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">법원 기준에 맞춰 가장 낮은 변제율을 자동으로 계산하고 검증합니다.</p>
+                            </div>
+                
+                <!-- 카드 5 -->
+                <div class="comparison-card" data-index="4">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">05</span>
+                        </div>
+                    <h3 class="text-lg font-bold text-white mb-2">실시간 진행현황</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">언제든 텔레그램으로 진행 상황을 확인하고 담당자와 소통할 수 있습니다.</p>
+                    </div>
+                
+                <!-- 카드 6 -->
+                <div class="comparison-card" data-index="5">
+                    <div class="mb-4">
+                        <span class="text-4xl font-black text-blue-500">06</span>
+                        </div>
+                    <h3 class="text-lg font-bold text-white mb-2">회생위원 질의 대응</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">예상 질의를 미리 파악하고 답변을 준비하여 보정명령을 최소화합니다.</p>
+                    </div>
+                </div>
+            
+            <!-- AI Technology -->
+            <div class="border-t border-stone-800 pt-20">
+                <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+                <div class="mb-10 lg:mb-0">
+                    <div class="inline-block bg-blue-900/50 border border-blue-500/30 rounded-full px-4 py-1 mb-6">
+                        <span class="text-blue-300 text-xs font-bold tracking-wide">AI TECHNOLOGY</span>
+                    </div>
+                    <h2 class="text-4xl font-black mb-6 leading-tight">
+                        판사님이 읽기도 전에,<br>
+                        <span class="text-blue-400">AI가 먼저 검증합니다.</span>
+                    </h2>
+                    <p class="text-stone-400 text-lg mb-8 leading-relaxed">
+                        서울회생법원 실무준칙, 회생위원 업무편람 등 방대한 공적 문서와 10만 건 이상의 회생 데이터를 학습했습니다.
+                    </p>
+                    
+                        <ul class="space-y-5">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">01</div>
+                            <div class="ml-4">
+                                    <h4 class="text-lg font-bold text-white">최적 변제계획안 자동 생성</h4>
+                                <p class="text-stone-400 text-sm mt-1">소득, 부양가족, 거주지 데이터를 분석하여 법원이 수용 가능한 '가장 낮은' 변제금을 산출합니다.</p>
+                            </div>
+                        </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">02</div>
+                            <div class="ml-4">
+                                    <h4 class="text-lg font-bold text-white">맞춤형 진술서 작성</h4>
+                                <p class="text-stone-400 text-sm mt-1">채무 발생 경위와 반성문을 의뢰인의 상황에 맞춰 판사님의 감성을 울리는 논리적 문장으로 생성합니다.</p>
+                            </div>
+                        </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">03</div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-bold text-white">회생위원 질의 사전 예측</h4>
+                                    <p class="text-stone-400 text-sm mt-1">과거 판례 기반으로 예상 질의를 도출하고, 답변서를 미리 준비합니다.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                    <!-- Terminal Window -->
+                    <div class="terminal-window" id="aiTerminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div>
+                            <div class="terminal-title">acro-ai — 변제계획 분석</div>
+                    </div>
+                        <div class="terminal-body" id="terminalBody">
+                            <div class="terminal-line" data-delay="0">
+                                <span class="terminal-prompt">$</span> <span class="terminal-command">acro analyze --case="김철수"</span>
+                    </div>
+                            <div class="terminal-line" data-delay="400">
+                                <span class="terminal-output">→ 의뢰인 정보 로딩...</span>
+                </div>
+                            <div class="terminal-line" data-delay="800">
+                                <span class="terminal-output terminal-success">✓ 소득 데이터 확인 완료</span>
+                            </div>
+                            <div class="terminal-line" data-delay="1100">
+                                <span class="terminal-output terminal-success">✓ 채무 목록 18건 확인</span>
+                            </div>
+                            <div class="terminal-line" data-delay="1400">
+                                <span class="terminal-output terminal-success">✓ 재산 목록 검증 완료</span>
+                            </div>
+                            <div class="terminal-line" data-delay="1800">
+                                <span class="terminal-output">→ 청산가치 계산 중...</span>
+                            </div>
+                            <div class="terminal-line" data-delay="2200">
+                                <span class="terminal-output">→ 가용소득 시뮬레이션 중...</span>
+                            </div>
+                            <div class="terminal-line" data-delay="2600">
+                                <span class="terminal-output terminal-highlight">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+                            </div>
+                            <div class="terminal-line" data-delay="2900">
+                                <span class="terminal-output terminal-highlight">분석 결과</span>
+                            </div>
+                            <div class="terminal-line" data-delay="3200">
+                                <span class="terminal-output">  총 채무액: <span class="terminal-highlight">158,420,000원</span></span>
+                            </div>
+                            <div class="terminal-line" data-delay="3500">
+                                <span class="terminal-output">  예상 변제율: <span class="terminal-success">12.4%</span></span>
+                            </div>
+                            <div class="terminal-line" data-delay="3800">
+                                <span class="terminal-output">  월 변제금: <span class="terminal-success">327,000원</span></span>
+                            </div>
+                            <div class="terminal-line" data-delay="4100">
+                                <span class="terminal-output">  예상 면책액: <span class="terminal-highlight">138,778,720원</span></span>
+                            </div>
+                            <div class="terminal-line" data-delay="4400">
+                                <span class="terminal-output terminal-highlight">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+                            </div>
+                            <div class="terminal-line" data-delay="4700">
+                                <span class="terminal-output terminal-warning">⚠ 교육비 추가 생계비 인정 가능 (자녀 2명)</span>
+                            </div>
+                            <div class="terminal-line" data-delay="5000">
+                                <span class="terminal-output terminal-success">✓ 변제계획안 초안 생성 완료</span>
+                            </div>
+                            <div class="terminal-line" data-delay="5300">
+                                <span class="terminal-prompt">$</span> <span class="terminal-cursor"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Survey Calculator Section - Chat Style -->
+    <section id="calculator" class="py-24 bg-stone-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <div class="inline-block bg-blue-100 border border-blue-200 rounded-full px-4 py-1 mb-4">
+                    <span class="text-blue-600 text-xs font-bold tracking-wide">무료 AI 진단</span>
+                </div>
+                <h2 class="text-3xl font-black text-stone-900 mb-4">나의 회생 가능성은?</h2>
+                <p class="text-lg text-stone-600 mb-3">
+                    간단한 질문에 답하면 <strong class="text-stone-900">회생 가능성</strong>과 <strong class="text-stone-900">예상 변제율</strong>을 바로 확인할 수 있습니다.
+                </p>
+                <p class="text-stone-500">
+                    진단 완료 후, 궁금한 점은 AI에게 자유롭게 질문하세요.
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto">
+                <!-- Chat Container (Full Width) -->
+                            <div>
+                    <div class="chat-container shadow-xl" id="chatSurvey">
+                        <!-- Chat Header -->
+                        <div class="chat-header">
+                            <div class="chat-avatar">AI</div>
+                            <div class="chat-header-info">
+                                <h4>아크로 AI 상담사</h4>
+                                <span id="chatStatus">대기 중</span>
+                            </div>
+                            <div class="chat-steps" id="chatSteps">
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                <div class="chat-step"></div>
+                                </div>
+                            </div>
+                            
+                        <!-- Chat Messages -->
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Welcome Message -->
+                            <div class="chat-message bot">
+                                <div class="chat-message-avatar">AI</div>
+                                <div class="chat-bubble">
+                                    안녕하세요! 👋 아크로 AI 상담사입니다.<br><br>
+                                    몇 가지 질문에 답해주시면 <strong>예상 변제율</strong>과 <strong>월 변제금</strong>을 계산해드릴게요.<br><br>
+                                    약 3분 정도 소요됩니다.
+                        </div>
+                    </div>
+                            </div>
+
+                        <!-- Chat Input Area -->
+                        <div class="chat-input-area" id="chatInputArea">
+                            <div id="chatStartBtn" class="text-center">
+                                <button onclick="startChatSurvey()" class="chat-submit" style="width: 100%; padding: 16px;">
+                                    상담 시작하기
+                                </button>
+                                </div>
+                            <div id="chatOptions" style="display: none;"></div>
+                                </div>
+                                </div>
+                    
+                    <!-- Hidden original survey container for API logic -->
+                    <div style="display: none;">
+                        <div class="survey-container" id="surveyContainer">
+                            <div id="surveyStart"></div>
+                            <div id="surveyQuestion" style="display: none;">
+                                <div class="survey-progress">
+                                    <div class="survey-progress-bar" id="surveyProgressBar" style="width: 0%"></div>
+                                </div>
+                                <span class="survey-category" id="surveyCategory">기본정보</span>
+                                <h3 class="survey-question" id="surveyQuestionTitle">질문</h3>
+                                <p class="survey-desc" id="surveyQuestionDesc">설명</p>
+                                <div id="surveyOptions"></div>
+                            </div>
+                            <div id="surveyLoading" style="display: none;"></div>
+                            <div id="surveyError" style="display: none;">
+                                <p id="surveyErrorMessage"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            
+            <p class="text-xs text-stone-400 text-center mt-4">* 입력하신 정보는 서버에 저장되지 않으며 진단 목적으로만 사용됩니다.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-gradient-to-b from-white to-stone-50 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-block bg-stone-100 border border-stone-200 rounded-full px-4 py-1 mb-4">
+                    <span class="text-stone-600 text-xs font-bold tracking-wide">PRICING</span>
+                </div>
+                <h2 class="text-4xl font-black text-stone-900 mb-4">투명한 비용 안내</h2>
+                <p class="text-lg text-stone-500 max-w-xl mx-auto">
+                    숨겨진 추가 비용 없이, 처음 안내드린 금액이 최종 금액입니다.
+                </p>
+            </div>
+
+            <!-- Pricing Comparison -->
+            <div class="grid lg:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
+                <!-- Others: Brief -->
+                <div class="bg-stone-100 rounded-2xl p-8 relative flex flex-col">
+                    <div class="absolute -top-3 left-6 bg-stone-400 text-white text-xs font-medium px-3 py-1 rounded-full">일반 사무소</div>
+                    <div class="pt-2 flex-1 flex flex-col">
+                        <div class="text-3xl font-bold text-stone-400 mb-1">150만원<span class="text-lg">~</span></div>
+                        <p class="text-sm text-stone-400 mb-6">+ 추가 비용 별도</p>
+                        
+                        <div class="space-y-4 text-sm flex-1">
+                            <div class="flex justify-between text-stone-500">
+                                <span>보정명령 1회</span>
+                                <span class="text-red-400 font-medium">+30만원</span>
+                            </div>
+                            <div class="flex justify-between text-stone-500">
+                                <span>부채증명서 대행</span>
+                                <span class="text-red-400 font-medium">+별도</span>
+                            </div>
+                            <div class="flex justify-between text-stone-500">
+                                <span>진술서 작성</span>
+                                <span class="text-red-400 font-medium">+별도</span>
+                            </div>
+                            <div class="flex justify-between text-stone-500">
+                                <span>서류 작성·접수</span>
+                                <span class="text-stone-400">포함</span>
+                            </div>
+                </div>
+
+                        <div class="pt-4 mt-6 border-t border-stone-200 flex justify-between font-bold text-stone-600">
+                            <span>예상 총액</span>
+                            <span>300만원+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acro: Featured -->
+                <div class="bg-stone-900 rounded-2xl p-8 text-white relative shadow-2xl flex flex-col">
+                    <div class="absolute -top-3 right-6 bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">추천</div>
+                    
+                    <div class="flex items-end justify-between mb-6 pt-2">
+                        <div>
+                            <h3 class="text-lg font-medium text-stone-400 mb-1">아크로 올인원</h3>
+                            <div class="text-4xl font-black">190<span class="text-xl font-bold">만원</span></div>
+                </div>
+                        <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full">추가비용 0원</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-6 flex-1">
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-blue-400 text-xs font-medium mb-1">서류 작성·접수</div>
+                            <div class="font-bold">전체 포함</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-blue-400 text-xs font-medium mb-1">보정명령 대응</div>
+                            <div class="font-bold">무제한 무료</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-blue-400 text-xs font-medium mb-1">AI 진술서</div>
+                            <div class="font-bold">맞춤 작성</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-blue-400 text-xs font-medium mb-1">분납</div>
+                            <div class="font-bold">10개월 무이자</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                        <div>
+                            <div class="text-stone-400 text-sm">월 분납 시</div>
+                            <div class="text-2xl font-bold">19만원<span class="text-sm font-normal text-stone-400"> / 월</span></div>
+                        </div>
+                        <button onclick="scrollToSection('contact')" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition">
+                            상담 신청
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trust badges -->
+            <div class="flex flex-wrap justify-center gap-6 mt-12 text-sm text-stone-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">✓</span>
+                    <span>기각시 100% 환불</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">✓</span>
+                    <span>계약 전 무료 상담</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">✓</span>
+                    <span>추가 비용 발생시 전액 부담</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-blue-600 text-sm font-bold tracking-wide uppercase">Testimonials</span>
+                <h2 class="text-4xl font-black text-stone-900 mt-3 mb-4">의뢰인 후기</h2>
+                <p class="text-stone-500">실제 의뢰인분들의 생생한 경험담입니다.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- 후기 1: 추가비용 없음 강조 -->
+                <div class="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        "다른 곳에서 상담받을 때는 <strong>보정명령 나오면 추가금 30만원</strong>이라고 해서 불안했는데, 
+                        아크로는 처음 안내받은 금액 그대로였어요. 실제로 보정명령이 2번 나왔는데도 
+                        <strong>정말 추가비용이 없었습니다.</strong> 이게 가장 큰 장점이었어요."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">K</div>
+                <div>
+                            <div class="font-bold text-stone-900">김** 님</div>
+                            <div class="text-sm text-stone-500">40대 · 자영업 · 채무 1.8억</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 후기 2: AI 정확도 / 변제율 강조 -->
+                <div class="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        "처음 무료 진단에서 나온 예상 변제율이 <strong>실제 인가받은 변제율과 거의 똑같았어요.</strong> 
+                        AI가 이렇게 정확할 줄 몰랐습니다. 덕분에 미리 마음의 준비도 할 수 있었고, 
+                        변제 계획도 현실적으로 세울 수 있었습니다."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">이</div>
+                                <div>
+                            <div class="font-bold text-stone-900">이** 님</div>
+                            <div class="text-sm text-stone-500">30대 · 회사원 · 채무 9천만원</div>
+                                </div>
+                            </div>
+                        </div>
+                
+                <!-- 후기 3: 텔레그램 소통 편의성 -->
+                <div class="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                        </div>
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        "회사 다니면서 전화 받기 어려웠는데, <strong>텔레그램으로 모든 진행이 가능해서</strong> 정말 편했습니다. 
+                        필요한 서류도 사진 찍어서 바로 전송하고, 궁금한 건 퇴근 후에 물어봐도 
+                        다음 날 아침에 답변이 와있었어요."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold">박</div>
+                        <div>
+                            <div class="font-bold text-stone-900">박** 님</div>
+                            <div class="text-sm text-stone-500">30대 · 직장인 · 채무 1.2억</div>
+                            </div>
+                            </div>
+                        </div>
+                
+                <!-- 후기 4: 전문성 / 보정명령 최소화 -->
+                <div class="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-stone-700 leading-relaxed mb-6">
+                        "주변에서 회생하면 보정명령이 여러 번 나온다고 들었는데, 저는 <strong>딱 한 번</strong>만 나왔어요. 
+                        변호사님이 처음부터 꼼꼼하게 서류 준비해주시고, AI가 회생위원 질문을 미리 예측해서 
+                        답변까지 준비해줬다고 하더라고요."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">최</div>
+                        <div>
+                            <div class="font-bold text-stone-900">최** 님</div>
+                            <div class="text-sm text-stone-500">50대 · 프리랜서 · 채무 2.3억</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+            <p class="text-center text-xs text-stone-400 mt-8">* 개인정보 보호를 위해 성명은 일부 가림 처리되었습니다.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-stone-900 text-white relative overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black mb-4">지금 바로 상담하세요</h2>
+                <p class="text-stone-400 text-lg">편하신 방법으로 연락주시면, 담당 변호사가 직접 답변드립니다.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 텔레그램 -->
+                <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all flex flex-col h-full">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">텔레그램 상담</h3>
+                            <p class="text-stone-400 text-sm">비밀 보장 · 서류 전송 가능</p>
+                        </div>
+                        <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full">추천</span>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <p class="text-stone-300 leading-relaxed mb-4">
+                            전화가 부담스러우시다면 텔레그램으로 편하게 상담하세요.
+                        </p>
+                        <p class="text-stone-400 text-sm">
+                            대화 내용은 암호화되어 <strong class="text-white">100% 비밀 보장</strong>됩니다.
+                        </p>
+                    </div>
+                    
+                    <a href="#" class="flex items-center justify-center gap-2 w-full px-6 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition mt-6">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                        </svg>
+                        텔레그램으로 상담하기
+                        </a>
+                    </div>
+                    
+                <!-- 전화 -->
+                <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all flex flex-col h-full">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 bg-stone-700 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">전화 상담</h3>
+                            <p class="text-stone-400 text-sm">직접 통화를 원하시면</p>
+                        </div>
+                            </div>
+                    
+                    <div class="flex-1">
+                        <div class="text-3xl font-black text-white mb-2">02-XXXX-XXXX</div>
+                        <div class="flex flex-wrap gap-2 text-sm mb-4">
+                            <span class="bg-white/10 px-3 py-1 rounded-full text-stone-300">평일 09:00-18:00</span>
+                            <span class="bg-white/10 px-3 py-1 rounded-full text-stone-300">24시간 접수</span>
+                        </div>
+                        <div class="text-sm text-stone-400 space-y-1">
+                            <p>서울시 서초구 서초대로</p>
+                            <p>contact@acro.law</p>
+                    </div>
+                </div>
+                    
+                    <a href="tel:02-XXXX-XXXX" class="flex items-center justify-center gap-2 w-full px-6 py-4 border-2 border-white/20 text-white rounded-xl font-bold hover:bg-white hover:text-stone-900 transition mt-6">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        전화 연결
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bottom info -->
+            <div class="mt-16 text-center">
+                <p class="text-stone-500 text-sm">
+                    상담 내용은 철저히 비밀이 보장되며, 상담만으로는 비용이 발생하지 않습니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-950 text-stone-400 py-12 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">법무법인 아크로</h3>
+                    <p class="text-sm">서울대 출신 AI 기술팀과 회생 전문 변호사가 함께하는 국내 최초의 AI 회생 솔루션입니다.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Service</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>개인회생 AI 진단</li>
+                        <li>개인파산 면책 신청</li>
+                        <li>법인회생 자문</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Info</h3>
+                    <p class="text-sm mb-2">사업자등록번호: XXX-XX-XXXXX</p>
+                    <p class="text-sm">광고책임변호사: 변호사 K</p>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-stone-800 text-xs text-center">
+                © 2024 Acro Law Firm. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        
+        // --- Navigation Logic ---
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                const yOffset = -80;
+                const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // --- Hero Particle Animation ---
+        const canvas = document.getElementById('hero-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 0.5;
+                    this.speedY = (Math.random() - 0.5) * 0.5;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                        this.reset();
+                    }
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(37, 99, 235, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+            
+            // Create particles
+            for (let i = 0; i < 80; i++) {
+                particles.push(new Particle());
+            }
+            
+            // Draw connections
+            function drawConnections() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 150) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(37, 99, 235, ${0.1 * (1 - distance / 150)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                
+                drawConnections();
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // --- Hero Typing Effect ---
+        const typingText = document.getElementById('typing-text');
+        if (typingText) {
+            const lines = ['회생의 정답을', '데이터와 AI로 증명합니다.'];
+            let lineIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let currentText = '';
+            
+            function type() {
+                if (lineIndex === 0) {
+                    // First line
+                    if (charIndex <= lines[0].length) {
+                        currentText = lines[0].substring(0, charIndex);
+                        typingText.innerHTML = currentText;
+                        charIndex++;
+                        setTimeout(type, 80);
+                    } else {
+                        // Move to second line
+                        lineIndex = 1;
+                        charIndex = 0;
+                        setTimeout(type, 300);
+                    }
+                } else {
+                    // Second line
+                    if (charIndex <= lines[1].length) {
+                        currentText = lines[0] + '<br><span class="gradient-text">' + lines[1].substring(0, charIndex) + '</span>';
+                        typingText.innerHTML = currentText;
+                        charIndex++;
+                        setTimeout(type, 80);
+                    } else {
+                        // Done - remove cursor after delay
+                        setTimeout(() => {
+                            const cursor = document.querySelector('.typing-cursor');
+                            if (cursor) cursor.style.display = 'none';
+                        }, 1500);
+                    }
+                }
+            }
+            
+            // Start typing after a short delay
+            setTimeout(type, 500);
+        }
+
+        // --- Comparison Grid Animation ---
+        const comparisonGrid = document.getElementById('comparisonGrid');
+        const comparisonCards = document.querySelectorAll('.comparison-card');
+        
+        if (comparisonGrid && comparisonCards.length > 0) {
+            const gridObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        comparisonCards.forEach((card, i) => {
+                            setTimeout(() => {
+                                card.classList.add('visible');
+                            }, i * 100);
+                        });
+                        gridObserver.disconnect();
+                    }
+                });
+            }, { threshold: 0.15 });
+            
+            gridObserver.observe(comparisonGrid);
+        }
+
+        // --- Terminal Animation ---
+        const aiTerminal = document.getElementById('aiTerminal');
+        const terminalLines = document.querySelectorAll('.terminal-line');
+        
+        if (aiTerminal && terminalLines.length > 0) {
+            let terminalAnimated = false;
+            
+            const terminalObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !terminalAnimated) {
+                        terminalAnimated = true;
+                        
+                        terminalLines.forEach(line => {
+                            const delay = parseInt(line.dataset.delay) || 0;
+                            setTimeout(() => {
+                                line.classList.add('visible');
+                            }, delay);
+                        });
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            terminalObserver.observe(aiTerminal);
+        }
+
+        // --- Stats Counter Animation ---
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        const animateCounter = (el) => {
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '%';
+            const duration = 2000;
+            const startTime = performance.now();
+            
+            const updateCounter = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out cubic
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = target * easeOut;
+                
+                if (target === 47) {
+                    el.textContent = `-${Math.floor(current)}%`;
+                } else if (suffix === '주') {
+                    el.textContent = `${Math.floor(current)}주`;
+                } else {
+                    el.textContent = `${current.toFixed(1)}%`;
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    // Final value
+                    if (target === 47) {
+                        el.textContent = '-47%';
+                    } else if (suffix === '주') {
+                        el.textContent = '2주';
+                    } else {
+                        el.textContent = '98.2%';
+                    }
+                }
+            };
+            
+            requestAnimationFrame(updateCounter);
+        };
+        
+        // Intersection Observer for stats
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        statNumbers.forEach(stat => statsObserver.observe(stat));
+
+        // --- Team Magazine Scroll Logic ---
+        const teamImages = document.querySelectorAll('.team-image');
+        const teamSections = document.querySelectorAll('.team-member-section');
+        
+        if (teamImages.length > 0 && teamSections.length > 0) {
+            const observerOptions = {
+                root: null,
+                rootMargin: '-40% 0px -40% 0px',
+                threshold: 0
+            };
+            
+            const teamObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const memberId = entry.target.dataset.member;
+                        teamImages.forEach(img => {
+                            img.classList.toggle('active', img.dataset.member === memberId);
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            teamSections.forEach(section => {
+                teamObserver.observe(section);
+            });
+        }
+
+        // --- Chart Config & Logic ---
+        Chart.defaults.font.family = "'Pretendard', sans-serif";
+        Chart.defaults.color = '#78716c';
+
+        // --- Chat Survey Wrapper ---
+        let chatStepCount = 0;
+        
+        function addChatMessage(text, isBot = true, delay = 0) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const messagesEl = document.getElementById('chatMessages');
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `chat-message ${isBot ? 'bot' : 'user'}`;
+                    msgDiv.innerHTML = `
+                        <div class="chat-message-avatar">${isBot ? 'AI' : '나'}</div>
+                        <div class="chat-bubble">${text}</div>
+                    `;
+                    messagesEl.appendChild(msgDiv);
+                    // Force scroll after render
+                    requestAnimationFrame(() => {
+                        messagesEl.scrollTop = messagesEl.scrollHeight;
+                    });
+                    resolve();
+                }, delay);
+            });
+        }
+        
+        function scrollChatToBottom() {
+            const messagesEl = document.getElementById('chatMessages');
+            if (messagesEl) {
+                requestAnimationFrame(() => {
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                });
+            }
+        }
+        
+        // 숫자 입력 시 천 단위 구분자 추가
+        function formatNumberInput(input) {
+            // 숫자만 추출
+            let value = input.value.replace(/[^0-9]/g, '');
+            // 천 단위 구분자 추가
+            if (value) {
+                input.value = parseInt(value, 10).toLocaleString('ko-KR');
+            } else {
+                input.value = '';
+            }
+        }
+        
+        // 포맷된 숫자에서 실제 숫자 추출
+        function parseFormattedNumber(str) {
+            return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+        }
+        
+        function showChatTyping() {
+            const messagesEl = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot';
+            typingDiv.id = 'chatTyping';
+            typingDiv.innerHTML = `
+                <div class="chat-message-avatar">AI</div>
+                <div class="chat-bubble chat-typing">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            messagesEl.appendChild(typingDiv);
+            scrollChatToBottom();
+        }
+        
+        function hideChatTyping() {
+            const typing = document.getElementById('chatTyping');
+            if (typing) typing.remove();
+        }
+        
+        function updateChatSteps(current) {
+            const steps = document.querySelectorAll('.chat-step');
+            steps.forEach((step, i) => {
+                step.classList.remove('active', 'done');
+                if (i < current) step.classList.add('done');
+                else if (i === current) step.classList.add('active');
+            });
+        }
+        
+        function renderChatOptions(step) {
+            const container = document.getElementById('chatOptions');
+            container.style.display = 'block';
+            document.getElementById('chatStartBtn').style.display = 'none';
+            
+            if (step.input_type === 'number') {
+                container.innerHTML = `
+                    <div class="chat-number-input">
+                        <input type="text" id="chatNumberInput" placeholder="0" 
+                               oninput="formatNumberInput(this)" onkeypress="return event.key === 'Enter' ? (submitChatAnswer(), false) : /[0-9]/.test(event.key)">
+                        <span class="text-stone-500">원</span>
+                        <button class="chat-submit" onclick="submitChatAnswer()">확인</button>
+                    </div>
+                `;
+                document.getElementById('chatNumberInput').focus();
+            } else if (step.input_type === 'form' && step.validation?.fields) {
+                function shouldShowField(field) {
+                    if (!field.condition) return true;
+                    const condition = field.condition;
+                    if (condition === 'rent_deposit') return sessionAnswers['step_03_housing'] === 'rent_deposit';
+                    if (condition === 'housing_owned') return sessionAnswers['step_03_housing'] === 'owned';
+                    const assetAnswers = sessionAnswers['step_07_assets'] || [];
+                    if (['deposit_over', 'insurance_savings', 'securities', 'crypto', 'vehicle'].includes(condition)) {
+                        return Array.isArray(assetAnswers) && assetAnswers.includes(condition);
+                    }
+                    if (condition === 'retirement_fund') return sessionAnswers['step_08_retirement'] === 'retirement_fund';
+                    return false;
+                }
+                
+                // Count visible fields
+                const visibleFields = step.validation.fields.filter(f => shouldShowField(f));
+                
+                // Show form in chat messages area instead of bottom
+                const messagesEl = document.getElementById('chatMessages');
+                const formDiv = document.createElement('div');
+                formDiv.className = 'chat-message bot';
+                formDiv.id = 'chatFormMessage';
+                
+                let formHTML = `
+                    <div class="chat-message-avatar">AI</div>
+                    <div class="chat-bubble" style="max-width: 100%; width: 100%;">
+                        <div class="chat-form-modal">
+                            <h4>재산 정보 입력</h4>
+                            <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">해당하는 항목의 금액을 입력해주세요. 정확한 금액을 모르면 대략적으로 입력해도 됩니다.</p>
+                `;
+                
+                let currentGroup = null;
+                visibleFields.forEach(field => {
+                    // 그룹 헤더 (섹션 구분)
+                    if (field.group && field.group !== currentGroup) {
+                        currentGroup = field.group;
+                        formHTML += `<div class="chat-form-section-title">${field.group}</div>`;
+                    }
+                    
+                    const tooltipHTML = field.tooltip ? `
+                        <div class="chat-form-field-tooltip">
+                            <div class="chat-form-field-tooltip-icon">?</div>
+                            <div class="chat-form-field-tooltip-text">${field.tooltip}</div>
+                        </div>
+                    ` : '';
+                    
+                    formHTML += `
+                        <div class="chat-form-field">
+                            <div class="chat-form-field-header">
+                                <span class="chat-form-field-label">${field.label}${field.required ? ' *' : ''}</span>
+                                ${tooltipHTML}
+                            </div>
+                            ${field.help ? `<div class="chat-form-field-help">${field.help}</div>` : ''}
+                            <div class="chat-form-field-input-row">
+                                <input type="text" data-field-id="${field.id}" placeholder="0" ${field.required ? 'required' : ''} 
+                                       oninput="formatNumberInput(this)" onkeypress="return /[0-9]/.test(event.key)">
+                                <span>원</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                formHTML += `
+                        </div>
+                    </div>
+                `;
+                
+                formDiv.innerHTML = formHTML;
+                messagesEl.appendChild(formDiv);
+                scrollChatToBottom();
+                
+                // Show submit button in bottom area
+                container.innerHTML = `
+                    <button class="chat-submit w-full" onclick="submitChatAnswer()" style="padding: 16px;">
+                        입력 완료 · 결과 계산하기
+                    </button>
+                `;
+            } else {
+                let html = '<div class="chat-options">';
+                step.options.forEach(option => {
+                    html += `<button class="chat-option" data-value="${option.value}" onclick="selectChatOption(this, '${step.input_type}')">${option.label}</button>`;
+                });
+                html += '</div>';
+                if (step.input_type === 'multi_choice') {
+                    html += `<button class="chat-submit w-full mt-3" onclick="submitChatAnswer()" id="chatSubmitBtn" disabled>선택 완료</button>`;
+                }
+                container.innerHTML = html;
+            }
+        }
+        
+        function selectChatOption(btn, inputType) {
+            if (inputType === 'single_choice' || inputType === 'yes_no') {
+                document.querySelectorAll('.chat-option').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedAnswers = [btn.dataset.value];
+                setTimeout(() => submitChatAnswer(), 300);
+            } else {
+                btn.classList.toggle('selected');
+                const value = btn.dataset.value;
+                const idx = selectedAnswers.indexOf(value);
+                if (idx > -1) selectedAnswers.splice(idx, 1);
+                else selectedAnswers.push(value);
+                
+                const submitBtn = document.getElementById('chatSubmitBtn');
+                if (submitBtn) submitBtn.disabled = selectedAnswers.length === 0;
+            }
+        }
+        
+        async function submitChatAnswer() {
+            let answer;
+            let answerText = '';
+            
+            if (currentStep.input_type === 'number') {
+                answer = parseFormattedNumber(document.getElementById('chatNumberInput').value);
+                if (isNaN(answer) || answer === 0) { alert('숫자를 입력해주세요.'); return; }
+                answerText = answer.toLocaleString() + (currentStep.step_id.includes('family') ? '명' : '원');
+            } else if (currentStep.input_type === 'form') {
+                answer = {};
+                let hasRequired = true;
+                // Find inputs in the form modal
+                document.querySelectorAll('#chatFormMessage input[data-field-id], .chat-form-input').forEach(input => {
+                    const fieldId = input.dataset.fieldId;
+                    if (fieldId) {
+                        const value = parseFormattedNumber(input.value);
+                        answer[fieldId] = value;
+                        if (input.required && value <= 0) hasRequired = false;
+                    }
+                });
+                if (!hasRequired) { alert('필수 항목을 입력해주세요.'); return; }
+                // Remove form message
+                const formMsg = document.getElementById('chatFormMessage');
+                if (formMsg) formMsg.remove();
+                answerText = '재산 정보 입력 완료';
+            } else if (currentStep.input_type === 'single_choice' || currentStep.input_type === 'yes_no') {
+                answer = selectedAnswers[0];
+                if (!answer) { alert('항목을 선택해주세요.'); return; }
+                const selected = document.querySelector(`.chat-option[data-value="${answer}"]`);
+                answerText = selected ? selected.textContent : answer;
+            } else {
+                answer = selectedAnswers;
+                if (answer.length === 0) { alert('항목을 선택해주세요.'); return; }
+                answerText = selectedAnswers.map(v => {
+                    const el = document.querySelector(`.chat-option[data-value="${v}"]`);
+                    return el ? el.textContent : v;
+                }).join(', ');
+            }
+            
+            // Add user message
+            await addChatMessage(answerText, false);
+            
+            // Show typing
+            document.getElementById('chatOptions').innerHTML = '';
+            showChatTyping();
+            document.getElementById('chatStatus').textContent = '분석 중...';
+            
+            try {
+                sessionAnswers[currentStep.step_id] = answer;
+                
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ step_id: currentStep.step_id, answer: answer })
+                });
+                
+                if (!response.ok) throw new Error('응답 제출 실패');
+                
+                const result = await response.json();
+                
+                hideChatTyping();
+                
+                if (result.is_complete) {
+                    // Small delay to show user their answer was recorded
+                    await new Promise(r => setTimeout(r, 300));
+                    await showChatResult();
+                } else if (result.next_step_id) {
+                    chatStepCount++;
+                    updateChatSteps(chatStepCount);
+                    await loadChatStep();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideChatTyping();
+                await addChatMessage('죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.', true);
+            }
+        }
+        
+        async function loadChatStep() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/step`);
+                if (!response.ok) throw new Error('단계 로드 실패');
+                
+                const step = await response.json();
+                currentStep = step;
+                selectedAnswers = [];
+                
+                // 'info' 타입은 입력이 필요없는 완료 단계 - 바로 결과 계산
+                if (step.input_type === 'info') {
+                    await showChatResult();
+                    return;
+                }
+                
+                document.getElementById('chatStatus').textContent = '응답 대기 중';
+                
+                // Add bot question message
+                await addChatMessage(`<strong>${step.title}</strong><br>${step.question}`, true, 500);
+                
+                // Render options
+                renderChatOptions(step);
+                scrollChatToBottom();
+            } catch (error) {
+                console.error('Error:', error);
+                await addChatMessage('단계를 불러오는데 실패했습니다.', true);
+            }
+        }
+        
+        async function startChatSurvey() {
+            document.getElementById('chatStartBtn').style.display = 'none';
+            showChatTyping();
+            document.getElementById('chatStatus').textContent = '연결 중...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                if (!response.ok) throw new Error('세션 생성 실패');
+                
+                const data = await response.json();
+                sessionId = data.session_id;
+                sessionAnswers = {};
+                chatStepCount = 0;
+                
+                hideChatTyping();
+                updateChatSteps(0);
+                
+                await addChatMessage('좋아요! 그럼 시작해볼게요. 😊', true, 300);
+                await loadChatStep();
+            } catch (error) {
+                console.error('Error:', error);
+                hideChatTyping();
+                await addChatMessage('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.', true);
+                document.getElementById('chatStartBtn').style.display = 'block';
+            }
+        }
+        
+        // Store result for context in chat
+        let surveyResult = null;
+        let isFreeChatMode = false;
+        
+        function showCalculationLoading() {
+            // Remove any existing overlay first
+            const existing = document.getElementById('chatLoadingOverlay');
+            if (existing) existing.remove();
+            
+            const chatContainer = document.getElementById('chatSurvey');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chat-loading-overlay';
+            loadingDiv.id = 'chatLoadingOverlay';
+            loadingDiv.innerHTML = `
+                <div class="chat-loading-spinner"></div>
+                <div class="chat-loading-text">AI가 분석 중입니다</div>
+                <div class="chat-loading-progress" id="loadingProgress">재산 정보 확인 중...</div>
+            `;
+            chatContainer.appendChild(loadingDiv);
+            
+            // Progress stages
+            const stages = [
+                '재산 정보 확인 중...',
+                '청산가치 계산 중...',
+                '가용소득 산정 중...',
+                '변제율 시뮬레이션 중...',
+                '최종 결과 생성 중...'
+            ];
+            let stageIndex = 0;
+            
+            const progressInterval = setInterval(() => {
+                stageIndex++;
+                const progressEl = document.getElementById('loadingProgress');
+                if (stageIndex < stages.length && progressEl) {
+                    progressEl.textContent = stages[stageIndex];
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 1200);
+            
+            return progressInterval;
+        }
+        
+        function hideCalculationLoading(intervalId) {
+            if (intervalId) clearInterval(intervalId);
+            const overlay = document.getElementById('chatLoadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        async function showChatResult() {
+            document.getElementById('chatStatus').textContent = '분석 중...';
+            updateChatSteps(10);
+            
+            // Hide options area
+            document.getElementById('chatOptions').style.display = 'none';
+            
+            // Show loading overlay
+            const loadingInterval = showCalculationLoading();
+            
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/calculate-with-agents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('계산 실패');
+                
+                const result = await response.json();
+                surveyResult = result;
+                hideCalculationLoading(loadingInterval);
+                
+                console.log('Backend result:', result); // 디버깅용
+                
+                // 백엔드 필드명에 맞춰 데이터 추출
+                const repaymentRate = result.repayment_rate || 0;
+                const monthlyRepayment = result.monthly_repayment_total || 0;
+                const totalRepayment = result.total_repayment || 0;
+                const totalDebt = result.total_debt || 0;
+                const securedDebt = result.secured_debt || 0;  // 별제권 채무
+                const unsecuredDebt = result.unsecured_debt || 0;  // 무담보 채무
+                const monthlyIncome = result.monthly_income || 0;
+                const livingExpenses = result.living_expenses || 0;
+                const monthlyAvailable = result.monthly_available || 0;
+                
+                // 탕감액 계산 (무담보 채무 기준)
+                const saved = unsecuredDebt - totalRepayment;
+                
+                // 결과 카드
+                const resultCardHTML = `
+                    분석이 완료되었습니다.
+                    <div class="chat-result-card">
+                        <div class="chat-result-title">변제계획 요약</div>
+                        <div class="chat-result-row highlight">
+                            <span class="chat-result-label">예상 변제율</span>
+                            <span class="chat-result-value primary">${repaymentRate.toFixed(1)}%</span>
+                        </div>
+                        <div class="chat-result-divider"></div>
+                        <div class="chat-result-row">
+                            <span class="chat-result-label">총 채무</span>
+                            <span class="chat-result-value">${totalDebt.toLocaleString()}원</span>
+                        </div>
+                        ${securedDebt > 0 ? `
+                        <div class="chat-result-row">
+                            <span class="chat-result-label">└ 별제권 (담보)</span>
+                            <span class="chat-result-value">${securedDebt.toLocaleString()}원</span>
+                        </div>` : ''}
+                        <div class="chat-result-row">
+                            <span class="chat-result-label">${securedDebt > 0 ? '└ 무담보 채무' : '무담보 채무'}</span>
+                            <span class="chat-result-value">${unsecuredDebt.toLocaleString()}원</span>
+                        </div>
+                        <div class="chat-result-divider"></div>
+                        <div class="chat-result-row">
+                            <span class="chat-result-label">총 변제액 (36개월)</span>
+                            <span class="chat-result-value">${totalRepayment.toLocaleString()}원</span>
+                        </div>
+                        <div class="chat-result-row">
+                            <span class="chat-result-label">월 변제금</span>
+                            <span class="chat-result-value">${monthlyRepayment.toLocaleString()}원</span>
+                        </div>
+                        <div class="chat-result-divider"></div>
+                        <div class="chat-result-row highlight">
+                            <span class="chat-result-label">예상 탕감액</span>
+                            <span class="chat-result-value accent">${saved.toLocaleString()}원</span>
+                        </div>
+                    </div>
+                `;
+                
+                await addChatMessage(resultCardHTML, true, 300);
+                
+                // Follow-up message for free chat
+                await new Promise(resolve => setTimeout(resolve, 800));
+                await addChatMessage(`
+                    위 결과는 입력하신 정보를 바탕으로 한 예상치입니다.<br><br>
+                    <strong>궁금한 점이 있으시면 자유롭게 질문해주세요!</strong><br>
+                    예: "도박 빚도 가능한가요?", "필요 서류가 뭔가요?" 등
+                `, true, 300);
+                
+                document.getElementById('chatStatus').textContent = '상담 중';
+                
+                // Enable free chat mode
+                enableFreeChatMode();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                hideCalculationLoading(loadingInterval);
+                await addChatMessage('결과 계산 중 오류가 발생했습니다. 다시 시도해주세요.', true);
+                document.getElementById('chatOptions').innerHTML = `
+                    <button class="chat-submit w-full" onclick="resetChatSurvey()">처음부터 다시</button>
+                `;
+                document.getElementById('chatOptions').style.display = 'block';
+            }
+        }
+        
+        function enableFreeChatMode() {
+            isFreeChatMode = true;
+            document.getElementById('chatOptions').innerHTML = `
+                <div class="chat-free-input">
+                    <input type="text" id="freeChatInput" placeholder="궁금한 점을 입력하세요..." onkeypress="if(event.key==='Enter')sendFreeChat()">
+                    <button onclick="sendFreeChat()">전송</button>
+                </div>
+            `;
+            document.getElementById('chatOptions').style.display = 'block';
+            
+            // Quick question buttons
+        setTimeout(() => {
+                const quickBtns = `
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px;">
+                        <button class="chat-option" onclick="sendFreeChatQuestion('필요 서류가 뭔가요?')">필요 서류?</button>
+                        <button class="chat-option" onclick="sendFreeChatQuestion('도박 빚도 되나요?')">도박 빚?</button>
+                        <button class="chat-option" onclick="sendFreeChatQuestion('비용이 얼마인가요?')">비용?</button>
+                        <button class="chat-option" onclick="scrollToSection('contact')">상담 신청</button>
+                    </div>
+                `;
+                document.getElementById('chatOptions').innerHTML += quickBtns;
+            }, 100);
+        }
+        
+        function sendFreeChatQuestion(text) {
+            document.getElementById('freeChatInput').value = text;
+            sendFreeChat();
+        }
+        
+        async function sendFreeChat() {
+            const input = document.getElementById('freeChatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Add user message
+            await addChatMessage(text, false, 0);
+            input.value = '';
+            
+            // Show typing indicator
+            showChatTyping();
+            
+            // Generate response (using existing chatbot logic)
+            setTimeout(async () => {
+                hideChatTyping();
+                
+                let response = "";
+                const lowerText = text.toLowerCase();
+                
+                if (lowerText.includes("서류")) {
+                    response = "<strong>기본 필요 서류</strong><br><br>• 신분증 사본<br>• 주민등록등본<br>• 소득증빙서류 (급여명세서/소득금액증명원)<br>• 부채증명서 (금융기관별)<br><br><strong>아크로 서비스 포함사항:</strong> 부채증명서 발급대행을 무료로 해드립니다.";
+                } else if (lowerText.includes("환불") || lowerText.includes("기각")) {
+                    response = "<strong>기각시 100% 환불 보장</strong><br><br>저희 아크로는 AI 정밀 분석을 통해 기각 확률을 최소화합니다.<br><br>만약 저희 과실로 기각될 경우 <strong>전액 환불</strong>해 드립니다. (단, 채무자 귀책사유 제외)";
+                } else if (lowerText.includes("도박") || lowerText.includes("주식") || lowerText.includes("코인")) {
+                    response = "<strong>도박/투자 빚도 가능합니다!</strong><br><br>서울회생법원 실무준칙(제32조)에 따르면:<br><br>• 도박/투자 손실금은 <strong>청산가치에서 제외</strong>되는 경우가 많습니다<br>• 단, 반성문과 갱생계획이 필요합니다<br><br>저희 전문가들이 법원 설득 논리를 만들어 드립니다.";
+                } else if (lowerText.includes("비용") || lowerText.includes("가격") || lowerText.includes("얼마")) {
+                    response = "<strong>아크로 올인원 패키지: 190만원</strong><br><br>포함 항목:<br>• 모든 서류 작성/접수<br>• 무제한 보정명령 대응 (추가비용 0원)<br>• AI 맞춤 진술서 작성<br>• 10개월 무이자 분납 가능<br><br>타 사무소 '150만원~' 광고 주의! 보정명령 1회당 30만원 추가됩니다.";
+                } else if (lowerText.includes("기간") || lowerText.includes("얼마나 걸")) {
+                    response = "<strong>회생 진행 기간</strong><br><br>• 서류 준비: 약 1-2주<br>• 법원 접수 후 개시결정: 1-2개월<br>• 인가결정: 접수 후 4-6개월<br>• 변제기간: 36개월 (3년)<br><br>총 약 4년 정도 소요됩니다.";
+                } else if (lowerText.includes("신용") || lowerText.includes("등급")) {
+                    response = "<strong>회생과 신용등급</strong><br><br>• 회생 신청시 신용등급이 낮아집니다<br>• 하지만 이미 연체가 있다면 큰 차이 없습니다<br>• <strong>인가결정 후 5년</strong> 지나면 기록 삭제<br>• 변제 완료 후 신용회복 가능";
+                } else if (surveyResult) {
+                    // Contextual response based on survey result
+                    const rate = surveyResult.repayment_rate || 0;
+                    response = `고객님의 예상 변제율 <strong>${rate.toFixed(1)}%</strong>를 기준으로 말씀드리면,<br><br>`;
+                    if (rate < 20) {
+                        response += "변제율이 낮아 <strong>회생 가능성이 높습니다.</strong> 자세한 상담을 통해 최적의 방안을 찾아드리겠습니다.";
+                    } else if (rate < 50) {
+                        response += "적정한 변제율입니다. 법원 인가 가능성이 높으며, 추가 최적화 여지도 있습니다.";
+                } else {
+                        response += "변제율이 다소 높지만, 재산/소득 구성에 따라 조정 가능합니다. 자세한 상담을 권장드립니다.";
+                    }
+                    response += "<br><br>더 궁금하신 점이 있으시면 물어봐주세요!";
+                } else {
+                    response = "문의주셔서 감사합니다.<br><br>더 정확한 상담을 위해 텔레그램이나 전화상담을 이용해주세요.<br>담당 변호사가 직접 답변드리겠습니다!";
+                }
+                
+                await addChatMessage(response, true, 100);
+            }, 800 + Math.random() * 400);
+        }
+        
+        function resetChatSurvey() {
+            isFreeChatMode = false;
+            surveyResult = null;
+            chatStepCount = 0;
+            sessionId = null;
+            sessionAnswers = {};
+            
+            // Reset chat steps UI
+            document.querySelectorAll('.chat-step').forEach(step => {
+                step.classList.remove('active', 'done');
+            });
+            
+            // Clear messages except welcome
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="chat-message bot">
+                    <div class="chat-message-avatar">AI</div>
+                    <div class="chat-bubble">
+                        안녕하세요! 👋 아크로 AI 상담사입니다.<br><br>
+                        몇 가지 질문에 답해주시면 <strong>예상 변제율</strong>과 <strong>월 변제금</strong>을 계산해드릴게요.<br><br>
+                        약 3분 정도 소요됩니다.
+                    </div>
+                </div>
+            `;
+            
+            // Reset input area
+            document.getElementById('chatStartBtn').style.display = 'block';
+            document.getElementById('chatOptions').style.display = 'none';
+            document.getElementById('chatStatus').textContent = '대기 중';
+        }
+
+        // --- Survey Logic with Backend API (Original - kept for compatibility) ---
+        let sessionId = null;
+        let currentStep = null;
+        let selectedAnswers = [];
+        let sessionAnswers = {};
+
+        async function startSurvey() {
+            showLoading();
+            
+            try {
+                // Create session
+                const response = await fetch(`${API_BASE}/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                if (!response.ok) throw new Error('세션 생성 실패');
+                
+                const data = await response.json();
+                sessionId = data.session_id;
+                
+                await loadStep();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+            }
+        }
+
+        async function loadStep() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/step`);
+                if (!response.ok) throw new Error('단계 로드 실패');
+                
+                const step = await response.json();
+                currentStep = step;
+                selectedAnswers = [];
+                
+                // Update progress
+                const progress = (step.progress / step.total_steps) * 100;
+                document.getElementById('surveyProgressBar').style.width = `${progress}%`;
+                
+                // Update content
+                const categoryLabels = {
+                    'eligibility': '신청자격',
+                    'personal': '기본정보',
+                    'income': '소득정보',
+                    'debt': '채무정보',
+                    'asset': '재산정보',
+                    'transaction': '거래내역',
+                    'special': '특별사정'
+                };
+                document.getElementById('surveyCategory').textContent = categoryLabels[step.category] || step.category;
+                document.getElementById('surveyQuestionTitle').textContent = step.title;
+                document.getElementById('surveyQuestionDesc').textContent = step.question;
+                
+                // Render options
+                renderOptions(step);
+                
+                // Update buttons
+                document.getElementById('surveyBackBtn').style.display = step.is_first ? 'none' : 'block';
+                document.getElementById('surveyNextBtn').textContent = step.is_last ? '결과 보기' : '다음';
+                
+                showQuestion();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('단계를 불러오는데 실패했습니다.');
+            }
+        }
+
+        function renderOptions(step) {
+            const container = document.getElementById('surveyOptions');
+            container.innerHTML = '';
+            
+            if (step.input_type === 'number') {
+                container.innerHTML = `
+                    <div class="form-field-group">
+                        <input type="number" 
+                               id="surveyNumberInput" 
+                               class="survey-input" 
+                               placeholder="숫자를 입력하세요"
+                               style="font-size: 1.25rem; font-weight: 600;">
+                        <div class="form-field-help text-right mt-2">원</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (step.input_type === 'text') {
+                container.innerHTML = `
+                    <div class="form-field-group">
+                        <textarea id="surveyTextInput" class="survey-input" placeholder="내용을 입력하세요" style="min-height: 100px; text-align: left;"></textarea>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (step.input_type === 'info') {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-stone-600">${step.help_text || '확인되었습니다.'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (step.input_type === 'form' && step.validation?.fields) {
+                let html = '';
+                
+                // 조건부 필드 필터링을 위한 헬퍼 함수
+                function shouldShowField(field) {
+                    if (!field.condition) return true; // 조건이 없으면 항상 표시
+                    
+                    const condition = field.condition;
+                    
+                    // 주거 관련 조건 (step_03_housing)
+                    if (condition === 'rent_deposit') {
+                        return sessionAnswers['step_03_housing'] === 'rent_deposit';
+                    }
+                    if (condition === 'housing_owned') {
+                        return sessionAnswers['step_03_housing'] === 'owned';
+                    }
+                    
+                    // 재산 관련 조건 (step_07_assets - multi_choice 배열)
+                    const assetAnswers = sessionAnswers['step_07_assets'] || [];
+                    if (['deposit_over', 'insurance_savings', 'securities', 'crypto', 'vehicle'].includes(condition)) {
+                        return Array.isArray(assetAnswers) && assetAnswers.includes(condition);
+                    }
+                    
+                    // 퇴직금 관련 조건 (step_08_retirement)
+                    if (condition === 'retirement_fund') {
+                        return sessionAnswers['step_08_retirement'] === 'retirement_fund';
+                    }
+                    
+                    return false; // 알 수 없는 조건은 숨김
+                }
+                
+                // 그룹별로 필드 정리
+                let currentGroup = null;
+                step.validation.fields.forEach(field => {
+                    if (!shouldShowField(field)) return; // 조건 미충족시 건너뛰기
+                    
+                    // 그룹 헤더 추가 (새 그룹 시작시)
+                    if (field.group && field.group !== currentGroup) {
+                        currentGroup = field.group;
+                        html += `<div class="form-group-header">${field.group}</div>`;
+                    }
+                    
+                    html += `
+                        <div class="form-field-group">
+                            <label class="form-field-label">${field.label}${field.required ? ' *' : ''}</label>
+                            <input type="number" class="survey-input" id="field_${field.id}" data-field-id="${field.id}" placeholder="0" min="0" ${field.required ? 'required' : ''}>
+                            ${field.help ? `<div class="form-field-help">${field.help}</div>` : ''}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                return;
+            }
+            
+            // Options (single/multi choice)
+            step.options.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'survey-option';
+                div.dataset.value = option.value;
+                div.onclick = () => toggleOption(option.value, step.input_type);
+                div.innerHTML = `
+                    <div class="survey-option-check"></div>
+                    <div class="flex-1">
+                        <span class="font-medium text-stone-800">${option.label}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleOption(value, inputType) {
+            if (inputType === 'single_choice' || inputType === 'yes_no') {
+                selectedAnswers = [value];
+            } else {
+                const idx = selectedAnswers.indexOf(value);
+                if (idx > -1) {
+                    selectedAnswers.splice(idx, 1);
+                } else {
+                    selectedAnswers.push(value);
+                }
+            }
+            
+            document.querySelectorAll('.survey-option').forEach(el => {
+                el.classList.toggle('selected', selectedAnswers.includes(el.dataset.value));
+            });
+        }
+
+        async function surveySubmit() {
+            let answer;
+            
+            if (currentStep.input_type === 'number') {
+                answer = parseInt(document.getElementById('surveyNumberInput').value);
+                if (isNaN(answer)) {
+                    alert('숫자를 입력해주세요.');
+                    return;
+                }
+            } else if (currentStep.input_type === 'text') {
+                answer = document.getElementById('surveyTextInput').value;
+            } else if (currentStep.input_type === 'info') {
+                answer = 'completed';
+            } else if (currentStep.input_type === 'form') {
+                answer = {};
+                let hasRequired = true;
+                document.querySelectorAll('.survey-input').forEach(input => {
+                    const fieldId = input.dataset.fieldId;
+                    if (fieldId) {
+                        const value = parseInt(input.value) || 0;
+                        answer[fieldId] = value;
+                        if (input.required && value <= 0) hasRequired = false;
+                    }
+                });
+                if (!hasRequired) {
+                    alert('필수 항목을 입력해주세요.');
+                    return;
+                }
+            } else if (currentStep.input_type === 'single_choice' || currentStep.input_type === 'yes_no') {
+                answer = selectedAnswers[0];
+                if (!answer) {
+                    alert('항목을 선택해주세요.');
+                    return;
+                }
+            } else {
+                answer = selectedAnswers;
+                if (answer.length === 0) {
+                    alert('항목을 선택해주세요.');
+                    return;
+                }
+            }
+            
+            showLoading();
+            
+            try {
+                sessionAnswers[currentStep.step_id] = answer;
+                
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ step_id: currentStep.step_id, answer: answer })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || '응답 제출 실패');
+                }
+                
+                const result = await response.json();
+                
+                if (result.is_complete) {
+                    await showResult();
+                } else if (result.next_step_id) {
+                    await loadStep();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('응답 제출에 실패했습니다.');
+            }
+        }
+
+        async function surveyGoBack() {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/back`, { method: 'POST' });
+                if (response.ok) {
+                    await loadStep();
+                } else {
+                    showQuestion();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showQuestion();
+            }
+        }
+
+        async function showResult() {
+            showLoading();
+            
+            try {
+                // Call the agent calculation endpoint
+                const response = await fetch(`${API_BASE}/sessions/${sessionId}/calculate-with-agents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) {
+                    // Fallback to summary if agent calculation fails
+                    const summaryResponse = await fetch(`${API_BASE}/sessions/${sessionId}/summary`);
+                    const summary = await summaryResponse.json();
+                    displayFallbackResult(summary);
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResult(data);
+                } else {
+                    showError(data.error || '계산에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('결과를 불러오는데 실패했습니다.');
+            }
+        }
+
+        // Legacy functions - kept for compatibility but uses chat flow now
+        function displayResult(data) {
+            console.log('displayResult called - use showChatResult instead');
+            // Chat flow handles result display now
+        }
+
+        function displayFallbackResult(summary) {
+            console.log('displayFallbackResult called - use showChatResult instead');
+            // Chat flow handles result display now
+        }
+
+        function resetSurvey() {
+            // Redirect to chat reset
+            resetChatSurvey();
+        }
+
+        function showStart() {
+            document.getElementById('surveyStart').style.display = 'block';
+            document.getElementById('surveyQuestion').style.display = 'none';
+            document.getElementById('surveyLoading').style.display = 'none';
+            document.getElementById('surveyError').style.display = 'none';
+        }
+
+        function showQuestion() {
+            document.getElementById('surveyStart').style.display = 'none';
+            document.getElementById('surveyQuestion').style.display = 'flex';
+            document.getElementById('surveyQuestion').style.flexDirection = 'column';
+            document.getElementById('surveyLoading').style.display = 'none';
+            document.getElementById('surveyError').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('surveyStart').style.display = 'none';
+            document.getElementById('surveyQuestion').style.display = 'none';
+            document.getElementById('surveyLoading').style.display = 'flex';
+            document.getElementById('surveyError').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('surveyStart').style.display = 'none';
+            document.getElementById('surveyQuestion').style.display = 'none';
+            document.getElementById('surveyLoading').style.display = 'none';
+            document.getElementById('surveyError').style.display = 'block';
+            document.getElementById('surveyErrorMessage').textContent = message;
+        }
+
+        function formatMoney(num) {
+            return new Intl.NumberFormat('ko-KR').format(Math.round(num)) + '원';
+        }
+
+    </script>
+</body>
+</html>

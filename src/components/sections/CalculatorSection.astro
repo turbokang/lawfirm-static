@@ -1,0 +1,28 @@
+---
+import SurveyWidget from "../interactive/SurveyWidget";
+---
+
+<section id="calculator" class="py-24 bg-stone-100">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <div class="inline-block bg-blue-100 border border-blue-200 rounded-full px-4 py-1 mb-4">
+        <span class="text-blue-600 text-xs font-bold tracking-wide">무료 AI 진단</span>
+      </div>
+      <h2 class="text-3xl font-black text-stone-900 mb-4">나의 회생 가능성은?</h2>
+      <p class="text-lg text-stone-600 mb-3">
+        간단한 질문에 답하면 <strong class="text-stone-900">회생 가능성</strong>과 <strong class="text-stone-900">예상 변제율</strong>을 바로 확인할 수 있습니다.
+      </p>
+      <p class="text-stone-500">
+        진단 완료 후, 궁금한 점은 AI에게 자유롭게 질문하세요.
+      </p>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      <div class="shadow-xl rounded-3xl overflow-hidden">
+        <SurveyWidget client:load />
+      </div>
+    </div>
+
+    <p class="text-xs text-stone-400 text-center mt-4">* 입력하신 정보는 서버에 저장되지 않으며 진단 목적으로만 사용됩니다.</p>
+  </div>
+</section>

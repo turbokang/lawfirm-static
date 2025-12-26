@@ -1,16 +1,20 @@
 ---
-
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSection from "../components/sections/HeroSection.astro";
+import TeamSection from "../components/sections/TeamSection.astro";
+import AITechSection from "../components/sections/AITechSection.astro";
+import CalculatorSection from "../components/sections/CalculatorSection.astro";
+import PricingSection from "../components/sections/PricingSection.astro";
+import TestimonialsSection from "../components/sections/TestimonialsSection.astro";
+import ContactSection from "../components/sections/ContactSection.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <HeroSection />
+  <TeamSection />
+  <AITechSection />
+  <CalculatorSection />
+  <PricingSection />
+  <TestimonialsSection />
+  <ContactSection />
+</BaseLayout>

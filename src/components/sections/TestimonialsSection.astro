@@ -1,0 +1,76 @@
+---
+const testimonials = [
+  {
+    content: `다른 곳에서 상담받을 때는 <strong>보정명령 나오면 추가금 30만원</strong>이라고 해서 불안했는데,
+      아크로는 처음 안내받은 금액 그대로였어요. 실제로 보정명령이 2번 나왔는데도
+      <strong>정말 추가비용이 없었습니다.</strong> 이게 가장 큰 장점이었어요.`,
+    name: "김** 님",
+    info: "40대 · 자영업 · 채무 1.8억",
+    avatar: "K",
+    bgColor: "bg-blue-100",
+    textColor: "text-blue-600"
+  },
+  {
+    content: `처음 무료 진단에서 나온 예상 변제율이 <strong>실제 인가받은 변제율과 거의 똑같았어요.</strong>
+      AI가 이렇게 정확할 줄 몰랐습니다. 덕분에 미리 마음의 준비도 할 수 있었고,
+      변제 계획도 현실적으로 세울 수 있었습니다.`,
+    name: "이** 님",
+    info: "30대 · 회사원 · 채무 9천만원",
+    avatar: "이",
+    bgColor: "bg-green-100",
+    textColor: "text-green-600"
+  },
+  {
+    content: `회사 다니면서 전화 받기 어려웠는데, <strong>텔레그램으로 모든 진행이 가능해서</strong> 정말 편했습니다.
+      필요한 서류도 사진 찍어서 바로 전송하고, 궁금한 건 퇴근 후에 물어봐도
+      다음 날 아침에 답변이 와있었어요.`,
+    name: "박** 님",
+    info: "30대 · 직장인 · 채무 1.2억",
+    avatar: "박",
+    bgColor: "bg-purple-100",
+    textColor: "text-purple-600"
+  },
+  {
+    content: `주변에서 회생하면 보정명령이 여러 번 나온다고 들었는데, 저는 <strong>딱 한 번</strong>만 나왔어요.
+      변호사님이 처음부터 꼼꼼하게 서류 준비해주시고, AI가 회생위원 질문을 미리 예측해서
+      답변까지 준비해줬다고 하더라고요.`,
+    name: "최** 님",
+    info: "50대 · 프리랜서 · 채무 2.3억",
+    avatar: "최",
+    bgColor: "bg-orange-100",
+    textColor: "text-orange-600"
+  }
+];
+---
+
+<section id="testimonials" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-blue-600 text-sm font-bold tracking-wide uppercase">Testimonials</span>
+      <h2 class="text-4xl font-black text-stone-900 mt-3 mb-4">의뢰인 후기</h2>
+      <p class="text-stone-500">실제 의뢰인분들의 생생한 경험담입니다.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      {testimonials.map((testimonial) => (
+        <div class="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-1 text-yellow-400 mb-4">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <p class="text-stone-700 leading-relaxed mb-6" set:html={`"${testimonial.content}"`} />
+          <div class="flex items-center gap-3">
+            <div class={`w-10 h-10 ${testimonial.bgColor} rounded-full flex items-center justify-center ${testimonial.textColor} font-bold`}>
+              {testimonial.avatar}
+            </div>
+            <div>
+              <div class="font-bold text-stone-900">{testimonial.name}</div>
+              <div class="text-sm text-stone-500">{testimonial.info}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="text-center text-xs text-stone-400 mt-8">* 개인정보 보호를 위해 성명은 일부 가림 처리되었습니다.</p>
+  </div>
+</section>

@@ -1,0 +1,158 @@
+---
+const features = [
+  { number: "01", title: "추가비용 0원 보장", description: "보정명령, 서류 보완 등 어떤 상황에서도 처음 안내드린 비용 외 추가금이 없습니다." },
+  { number: "02", title: "금융기관 대응 노하우", description: "은행/카드사 전산망을 구축한 경험으로 채권자 논리를 정확히 파악합니다." },
+  { number: "03", title: "AI 서류 자동화", description: "수만 건의 판례를 학습한 AI가 변제계획안과 진술서를 자동 생성합니다." },
+  { number: "04", title: "최저 변제율 설계", description: "법원 기준에 맞춰 가장 낮은 변제율을 자동으로 계산하고 검증합니다." },
+  { number: "05", title: "실시간 진행현황", description: "언제든 텔레그램으로 진행 상황을 확인하고 담당자와 소통할 수 있습니다." },
+  { number: "06", title: "회생위원 질의 대응", description: "예상 질의를 미리 파악하고 답변을 준비하여 보정명령을 최소화합니다." }
+];
+
+const terminalLines = [
+  { delay: 0, content: '<span class="terminal-prompt">$</span> <span class="terminal-command">acro analyze --case="김철수"</span>' },
+  { delay: 400, content: '<span class="terminal-output">→ 의뢰인 정보 로딩...</span>' },
+  { delay: 800, content: '<span class="terminal-output terminal-success">✓ 소득 데이터 확인 완료</span>' },
+  { delay: 1100, content: '<span class="terminal-output terminal-success">✓ 채무 목록 18건 확인</span>' },
+  { delay: 1400, content: '<span class="terminal-output terminal-success">✓ 재산 목록 검증 완료</span>' },
+  { delay: 1800, content: '<span class="terminal-output">→ 청산가치 계산 중...</span>' },
+  { delay: 2200, content: '<span class="terminal-output">→ 가용소득 시뮬레이션 중...</span>' },
+  { delay: 2600, content: '<span class="terminal-output terminal-highlight">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>' },
+  { delay: 2900, content: '<span class="terminal-output terminal-highlight">분석 결과</span>' },
+  { delay: 3200, content: '<span class="terminal-output">  총 채무액: <span class="terminal-highlight">158,420,000원</span></span>' },
+  { delay: 3500, content: '<span class="terminal-output">  예상 변제율: <span class="terminal-success">12.4%</span></span>' },
+  { delay: 3800, content: '<span class="terminal-output">  월 변제금: <span class="terminal-success">327,000원</span></span>' },
+  { delay: 4100, content: '<span class="terminal-output">  예상 면책액: <span class="terminal-highlight">138,778,720원</span></span>' },
+  { delay: 4400, content: '<span class="terminal-output terminal-highlight">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>' },
+  { delay: 4700, content: '<span class="terminal-output terminal-warning">⚠ 교육비 추가 생계비 인정 가능 (자녀 2명)</span>' },
+  { delay: 5000, content: '<span class="terminal-output terminal-success">✓ 변제계획안 초안 생성 완료</span>' },
+  { delay: 5300, content: '<span class="terminal-prompt">$</span> <span class="terminal-cursor"></span>' }
+];
+---
+
+<section id="ai-tech" class="py-24 bg-stone-900 text-white overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <span class="text-blue-400 text-sm font-bold tracking-wide uppercase">Why Us</span>
+      <h2 class="text-4xl font-black mt-3 mb-6">왜 '융합 전문가'가 필요한가요?</h2>
+      <p class="text-stone-400 text-lg max-w-2xl mx-auto leading-relaxed">
+        개인회생은 단순한 법률 문제가 아닙니다.<br>
+        <strong class="text-white">법률 + 금융 + 기술</strong>, 세 가지가 모두 필요합니다.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-20" id="comparisonGrid">
+      {features.map((feature, index) => (
+        <div class={`comparison-card ${index === 0 ? 'visible' : ''}`} data-index={index}>
+          <div class="mb-4">
+            <span class="text-4xl font-black text-blue-500">{feature.number}</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">{feature.title}</h3>
+          <p class="text-stone-400 text-sm leading-relaxed">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="border-t border-stone-800 pt-20">
+      <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+        <div class="mb-10 lg:mb-0">
+          <div class="inline-block bg-blue-900/50 border border-blue-500/30 rounded-full px-4 py-1 mb-6">
+            <span class="text-blue-300 text-xs font-bold tracking-wide">AI TECHNOLOGY</span>
+          </div>
+          <h2 class="text-4xl font-black mb-6 leading-tight">
+            판사님이 읽기도 전에,<br>
+            <span class="text-blue-400">AI가 먼저 검증합니다.</span>
+          </h2>
+          <p class="text-stone-400 text-lg mb-8 leading-relaxed">
+            서울회생법원 실무준칙, 회생위원 업무편람 등 방대한 공적 문서와 10만 건 이상의 회생 데이터를 학습했습니다.
+          </p>
+
+          <ul class="space-y-5">
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">01</div>
+              <div class="ml-4">
+                <h4 class="text-lg font-bold text-white">최적 변제계획안 자동 생성</h4>
+                <p class="text-stone-400 text-sm mt-1">소득, 부양가족, 거주지 데이터를 분석하여 법원이 수용 가능한 '가장 낮은' 변제금을 산출합니다.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">02</div>
+              <div class="ml-4">
+                <h4 class="text-lg font-bold text-white">맞춤형 진술서 작성</h4>
+                <p class="text-stone-400 text-sm mt-1">채무 발생 경위와 반성문을 의뢰인의 상황에 맞춰 판사님의 감성을 울리는 논리적 문장으로 생성합니다.</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">03</div>
+              <div class="ml-4">
+                <h4 class="text-lg font-bold text-white">회생위원 질의 사전 예측</h4>
+                <p class="text-stone-400 text-sm mt-1">과거 판례 기반으로 예상 질의를 도출하고, 답변서를 미리 준비합니다.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="terminal-window" id="aiTerminal">
+          <div class="terminal-header">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <div class="terminal-title">acro-ai — 변제계획 분석</div>
+          </div>
+          <div class="terminal-body" id="terminalBody">
+            {terminalLines.map((line) => (
+              <div class="terminal-line" data-delay={line.delay} set:html={line.content} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Comparison Grid Animation
+  const comparisonGrid = document.getElementById('comparisonGrid');
+  const comparisonCards = document.querySelectorAll('.comparison-card');
+
+  if (comparisonGrid && comparisonCards.length > 0) {
+    const gridObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          comparisonCards.forEach((card, i) => {
+            setTimeout(() => {
+              card.classList.add('visible');
+            }, i * 100);
+          });
+          gridObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.15 });
+
+    gridObserver.observe(comparisonGrid);
+  }
+
+  // Terminal Animation
+  const aiTerminal = document.getElementById('aiTerminal');
+  const terminalLines = document.querySelectorAll('.terminal-line');
+
+  if (aiTerminal && terminalLines.length > 0) {
+    let terminalAnimated = false;
+
+    const terminalObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !terminalAnimated) {
+          terminalAnimated = true;
+
+          terminalLines.forEach(line => {
+            const delay = parseInt((line as HTMLElement).dataset.delay || '0');
+            setTimeout(() => {
+              line.classList.add('visible');
+            }, delay);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    terminalObserver.observe(aiTerminal);
+  }
+</script>

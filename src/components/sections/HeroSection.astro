@@ -1,0 +1,169 @@
+---
+---
+
+<header id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden bg-stone-50">
+  <canvas id="hero-canvas"></canvas>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <div class="hero-fade-in inline-block bg-stone-900 rounded-full px-4 py-1.5 mb-8">
+      <span class="text-stone-300 text-sm font-medium tracking-wide">서울대 로스쿨 × 핀테크 창업자</span>
+    </div>
+
+    <h1 class="hero-title text-5xl md:text-7xl font-black tracking-tight text-stone-900 mb-8 leading-tight">
+      <span id="typing-text"></span><span class="typing-cursor"></span>
+    </h1>
+
+    <p class="hero-fade-in hero-fade-in-delay-3 mt-4 text-xl text-stone-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+      국내 유일, 금융기관 전산망을 구축한 핀테크 전문가와 변호사가 직접 개발했습니다.<br class="hidden md:block">
+      채무자회생법과 수만 건의 판례를 학습한 AI가 당신의 최저 변제율을 설계합니다.
+    </p>
+
+    <div class="hero-fade-in hero-fade-in-delay-4 flex flex-col sm:flex-row justify-center gap-4">
+      <button onclick="scrollToSection('calculator')" class="px-8 py-4 bg-stone-900 text-white rounded-full font-bold text-lg hover:bg-stone-800 transition transform hover:scale-105">
+        내 예상 변제금 확인하기
+      </button>
+      <button onclick="scrollToSection('contact')" class="px-8 py-4 bg-transparent text-stone-700 border-2 border-stone-300 rounded-full font-bold text-lg hover:border-stone-900 hover:text-stone-900 transition">
+        무료 상담 신청
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-indicator" onclick="scrollToSection('team')">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</header>
+
+<script>
+  // Hero Particle Animation
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      let particles: Particle[] = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      class Particle {
+        x: number = 0;
+        y: number = 0;
+        size: number = 0;
+        speedX: number = 0;
+        speedY: number = 0;
+        opacity: number = 0;
+
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = (Math.random() - 0.5) * 0.5;
+          this.speedY = (Math.random() - 0.5) * 0.5;
+          this.opacity = Math.random() * 0.5 + 0.1;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+            this.reset();
+          }
+        }
+
+        draw() {
+          if (!ctx) return;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(37, 99, 235, ${this.opacity})`;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle());
+      }
+
+      function drawConnections() {
+        if (!ctx) return;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 150) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(37, 99, 235, ${0.1 * (1 - distance / 150)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animate() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+
+        drawConnections();
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+  }
+
+  // Hero Typing Effect
+  const typingText = document.getElementById('typing-text');
+  if (typingText) {
+    const lines = ['회생의 정답을', '데이터와 AI로 증명합니다.'];
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentText = '';
+
+    function type() {
+      if (lineIndex === 0) {
+        if (charIndex <= lines[0].length) {
+          currentText = lines[0].substring(0, charIndex);
+          typingText.innerHTML = currentText;
+          charIndex++;
+          setTimeout(type, 80);
+        } else {
+          lineIndex = 1;
+          charIndex = 0;
+          setTimeout(type, 300);
+        }
+      } else {
+        if (charIndex <= lines[1].length) {
+          currentText = lines[0] + '<br><span class="gradient-text">' + lines[1].substring(0, charIndex) + '</span>';
+          typingText.innerHTML = currentText;
+          charIndex++;
+          setTimeout(type, 80);
+        } else {
+          setTimeout(() => {
+            const cursor = document.querySelector('.typing-cursor') as HTMLElement;
+            if (cursor) cursor.style.display = 'none';
+          }, 1500);
+        }
+      }
+    }
+
+    setTimeout(type, 500);
+  }
+</script>

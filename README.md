@@ -1,43 +1,61 @@
-# Astro Starter Kit: Minimal
+## Requirements
+pnpm
+pnpm install
 
-```sh
-pnpm create astro@latest -- --template minimal
+## How to run
+pnpm run dev
+
+## Structure
 ```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
+acro-landing/
 ├── public/
+│   ├── favicon.ico
+│   ├── og-image.png              # Open Graph 이미지
+│   ├── robots.txt
+│   └── images/
+│       └── team/                  # 팀 이미지
+│
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Navigation.astro
+│   │   │   └── Footer.astro
+│   │   │
+│   │   ├── sections/
+│   │   │   ├── HeroSection.astro
+│   │   │   ├── TeamSection.astro
+│   │   │   ├── AITechSection.astro
+│   │   │   ├── PricingSection.astro
+│   │   │   ├── TestimonialsSection.astro
+│   │   │   └── ContactSection.astro
+│   │   │
+│   │   └── interactive/
+│   │       ├── SurveyWidget.tsx   # React 컴포넌트 (hydration)
+│   │       └── TerminalDemo.astro
+│   │
+│   ├── layouts/
+│   │   └── BaseLayout.astro       # 공통 레이아웃
+│   │
+│   ├── pages/
+│   │   ├── index.astro            # 메인 랜딩 페이지
+│   │   ├── reviews/               # 향후 고객후기 페이지
+│   │   │   └── index.astro
+│   │   └── team/                  # 향후 구성원 상세 페이지
+│   │       └── [slug].astro
+│   │
+│   ├── content/                   # 콘텐츠 컬렉션 (향후)
+│   │   ├── reviews/
+│   │   │   └── review-001.md
+│   │   └── team/
+│   │       └── lawyer-k.md
+│   │
+│   ├── styles/
+│   │   └── global.css             # 전역 스타일 (애니메이션 등)
+│   │
+│   └── utils/
+│       └── api.ts                 # API 호출 함수
+│
+├── astro.config.mjs
+├── tailwind.config.mjs
 └── package.json
 ```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
